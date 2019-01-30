@@ -58,6 +58,8 @@ import org.kie.workbench.common.stunner.bpmn.definition.property.gateway.Gateway
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.BPMNGeneralSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Documentation;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Name;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationsInfo;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentsInfo;
 import org.kie.workbench.common.stunner.bpmn.definition.property.simulation.SimulationAttributeSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.AdHocAutostart;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.AdHocCompletionCondition;
@@ -1362,6 +1364,8 @@ public class HashCodeAndEqualityTest {
                                                       new Actors(),
                                                       new Groupid(),
                                                       new AssignmentsInfo(),
+                                                      new NotificationsInfo(),
+                                                      new ReassignmentsInfo(),
                                                       new IsAsync(),
                                                       new Skippable(),
                                                       new Priority(),
@@ -1384,6 +1388,8 @@ public class HashCodeAndEqualityTest {
                                                       new Actors(),
                                                       new Groupid(),
                                                       new AssignmentsInfo(),
+                                                      new NotificationsInfo(),
+                                                      new ReassignmentsInfo(),
                                                       new IsAsync(),
                                                       new Skippable(),
                                                       new Priority(),

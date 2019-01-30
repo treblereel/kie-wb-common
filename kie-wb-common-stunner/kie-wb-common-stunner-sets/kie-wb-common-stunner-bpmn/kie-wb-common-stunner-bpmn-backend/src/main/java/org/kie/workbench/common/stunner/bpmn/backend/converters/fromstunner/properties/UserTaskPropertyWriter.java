@@ -27,8 +27,13 @@ import org.eclipse.bpmn2.ResourceAssignmentExpression;
 import org.eclipse.bpmn2.UserTask;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties.CustomElement;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties.CustomInput;
+import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties.ParsedNotificationsInfos;
+import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties.ParsedReassignmentsInfos;
+import org.kie.workbench.common.stunner.bpmn.backend.converters.fromstunner.associations.AssociationType;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.tostunner.properties.Scripts;
 import org.kie.workbench.common.stunner.bpmn.definition.property.assignee.Actors;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationsInfo;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentsInfo;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.OnEntryAction;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.OnExitAction;
 
@@ -45,6 +50,10 @@ public class UserTaskPropertyWriter extends MultipleInstanceActivityPropertyWrit
     private final CustomInput<String> priority;
     private final CustomInput<String> subject;
     private final CustomInput<String> content;
+    private final CustomInput<String> notStartedReassign;
+    private final CustomInput<String> notCompletedReassign;
+    private final CustomInput<String> notStartedNotify;
+    private final CustomInput<String> notCompletedNotify;
 
     public UserTaskPropertyWriter(UserTask task, VariableScope variableScope) {
         super(task, variableScope);
@@ -73,6 +82,18 @@ public class UserTaskPropertyWriter extends MultipleInstanceActivityPropertyWrit
 
         this.content = CustomInput.content.of(task);
         this.addItemDefinition(this.content.typeDef());
+
+        this.notStartedReassign = CustomInput.notStartedReassign.of(task);
+        this.addItemDefinition(this.notStartedReassign.typeDef());
+
+        this.notCompletedReassign = CustomInput.notCompletedReassign.of(task);
+        this.addItemDefinition(this.notCompletedReassign.typeDef());
+
+        this.notStartedNotify = CustomInput.notStartedNotify.of(task);
+        this.addItemDefinition(this.notStartedNotify.typeDef());
+
+        this.notCompletedNotify = CustomInput.notCompletedNotify.of(task);
+        this.addItemDefinition(this.notCompletedNotify.typeDef());
     }
 
     public void setAsync(boolean async) {
@@ -125,12 +146,23 @@ public class UserTaskPropertyWriter extends MultipleInstanceActivityPropertyWrit
         }
     }
 
+    public void setReassignments(ReassignmentsInfo reassignments){
+        fromReassignmentString(reassignments.getValue());
+    }
+
     private List<String> fromActorString(String delimitedActors) {
         String[] split = delimitedActors.split(",");
         if (split.length == 1 && split[0].isEmpty()) {
             return Collections.emptyList();
         } else {
             return Arrays.asList(split);
+        }
+    }
+
+    private void fromReassignmentString(String json) {
+        if(json != null && !json.isEmpty()){
+            notStartedReassign.set(ParsedReassignmentsInfos.ofCDATA(json, AssociationType.NotStartedReassign));
+            notCompletedReassign.set(ParsedReassignmentsInfos.ofCDATA(json, AssociationType.NotCompletedReassign));
         }
     }
 
@@ -152,5 +184,16 @@ public class UserTaskPropertyWriter extends MultipleInstanceActivityPropertyWrit
 
     public void setSLADueDate(String slaDueDate) {
         CustomElement.slaDueDate.of(task).set(slaDueDate);
+    }
+
+    public void setNotifications(NotificationsInfo notificationsInfo) {
+        fromNotificationString(notificationsInfo.getValue());
+    }
+
+    private void fromNotificationString(String json) {
+        if(json != null && !json.isEmpty()){
+            notStartedNotify.set(ParsedNotificationsInfos.ofCDATA(json, AssociationType.NotStartedNotify));
+            notCompletedNotify.set(ParsedNotificationsInfos.ofCDATA(json, AssociationType.NotCompletedNotify));
+        }
     }
 }
