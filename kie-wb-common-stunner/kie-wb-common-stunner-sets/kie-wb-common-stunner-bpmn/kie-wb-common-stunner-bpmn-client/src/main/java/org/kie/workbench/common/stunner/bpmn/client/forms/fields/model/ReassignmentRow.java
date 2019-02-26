@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jboss.errai.databinding.client.api.Bindable;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentValue;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
 
 /**
@@ -48,7 +49,7 @@ public class ReassignmentRow {
         this.id = lastId++;
     }
 
-    public ReassignmentRow(Reassignment reassignment) {
+    public ReassignmentRow(ReassignmentValue reassignment) {
         this.id = lastId++;
         this.setType(ReassignmentType.get(reassignment.getType()));
         this.setDuration(reassignment.getDuration());
@@ -104,6 +105,15 @@ public class ReassignmentRow {
         clone.setGroups(getGroups());
         clone.setUsers(getUsers());
         return clone;
+    }
+
+    public ReassignmentValue toReassignmentValue(){
+        ReassignmentValue value = new ReassignmentValue();
+        value.setType(getType().getAlias());
+        value.setDuration(getDuration());
+        value.setGroups(getGroups());
+        value.setUsers(getUsers());
+        return value;
     }
 
     @Override

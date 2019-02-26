@@ -16,8 +16,6 @@
 
 package org.kie.workbench.common.stunner.bpmn.client.forms.fields.reassignmentsEditor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -27,38 +25,34 @@ import javax.inject.Inject;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
-import org.jboss.errai.common.client.dom.Button;
-import org.jboss.errai.common.client.dom.TextInput;
+import elemental2.dom.HTMLButtonElement;
+import elemental2.dom.HTMLInputElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.Reassignment;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.ReassignmentRow;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.reassignmentsEditor.widget.ReassignmentWidget;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentTypeListValue;
 
 @Dependent
 @Templated
-public class ReassignmentsEditorWidget extends Composite implements HasValue<String> {
+public class ReassignmentsEditorWidget extends Composite implements HasValue<ReassignmentTypeListValue> {
 
     private GetReassignmentsCallback callback = null;
 
-    private String reassignmentsInfo;
+    private ReassignmentTypeListValue reassignmentTypeListValue = new ReassignmentTypeListValue();
 
     @Inject
     @DataField
-    private Button reassignmentsButton;
+    private HTMLButtonElement reassignmentsButton;
 
     @Inject
     private ReassignmentWidget reassignmentWidget;
 
     @Inject
     @DataField
-    private TextInput reassignmentsTextBox;
-
-    private List<Reassignment> reassignments = new ArrayList<>();
+    private HTMLInputElement reassignmentsTextBox;
 
     public ReassignmentsEditorWidget() {
 
@@ -70,63 +64,53 @@ public class ReassignmentsEditorWidget extends Composite implements HasValue<Str
         reassignmentsTextBox.addEventListener("click", event -> showReassignmentsDialog(), false);
     }
 
-    @Override
-    public String getValue() {
-        return reassignmentsInfo;
+    private void showReassignmentsDialog() {
+        reassignmentWidget.setValue(reassignmentTypeListValue.getValues()
+                .stream(
+                ).map(r -> new ReassignmentRow(r))
+                .collect(Collectors.toList()), true);
+        reassignmentWidget.setCallback(data -> setValue(data,
+                true));
+        reassignmentWidget.show();
     }
 
     @Override
-    public void setValue(String json) {
-        setValue(json,
-                false);
-    }
-
-    private void updateReassignment(String json) {
-        JSONArray array = JSONParser.parseStrict(json).isArray();
-        reassignments.clear();
-        for (int i = 0; i < array.size(); i++) {
-            reassignments.add(Reassignment.fromJSONObject(array.get(i).isObject()));
-        }
-    }
-
-    @Override
-    public void setValue(String json, boolean fireEvents) {
-        if (json != null && !json.isEmpty()) {
-            updateReassignment(json);
-        }
-        String oldValue = reassignmentsInfo;
-        reassignmentsInfo = json;
-        initTextBox();
-        if (fireEvents) {
-            ValueChangeEvent.fireIfNotEqual(this,
-                    oldValue,
-                    reassignmentsInfo);
+    public void setValue(ReassignmentTypeListValue value, boolean fireEvents) {
+        if (value != null) {
+            ReassignmentTypeListValue oldValue = reassignmentTypeListValue;
+            reassignmentTypeListValue = value;
+            initTextBox();
+            if (fireEvents) {
+                ValueChangeEvent.fireIfNotEqual(this,
+                        oldValue,
+                        reassignmentTypeListValue);
+            }
         }
     }
 
     private void initTextBox() {
-        if (reassignments == null) {
-            reassignmentsTextBox.setValue("empty");
+        if (reassignmentTypeListValue == null) {
+            reassignmentsTextBox.value = "zero reassignments";
         } else {
-            reassignmentsTextBox.setValue("{" + reassignments.size() + " } reassignments");
+            reassignmentsTextBox.value = reassignmentTypeListValue.getValues().size() + " reassignments";
         }
     }
 
     @Override
-    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-        return addHandler(handler,
-                ValueChangeEvent.getType());
+    public ReassignmentTypeListValue getValue() {
+        return reassignmentTypeListValue;
     }
 
-    private void showReassignmentsDialog() {
-        reassignmentWidget.setValue(reassignments
-                .stream(
-                ).map(r -> new ReassignmentRow(r))
-                .collect(Collectors.toList()), true);
+    @Override
+    public void setValue(ReassignmentTypeListValue value) {
+        setValue(value,
+                false);
+    }
 
-        reassignmentWidget.setCallback(reassignmentsData -> setValue(reassignmentsData,
-                true));
-        reassignmentWidget.show();
+    @Override
+    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ReassignmentTypeListValue> handler) {
+        return addHandler(handler,
+                ValueChangeEvent.getType());
     }
 
     public void setReadOnly(final boolean readOnly) {
@@ -139,6 +123,6 @@ public class ReassignmentsEditorWidget extends Composite implements HasValue<Str
      */
     public interface GetReassignmentsCallback {
 
-        void getData(String reassignmentsData);
+        void getData(ReassignmentTypeListValue reassignmentTypeListValue);
     }
 }

@@ -30,7 +30,6 @@ import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.property.Type;
 import org.kie.workbench.common.stunner.core.definition.annotation.property.Value;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyType;
-import org.kie.workbench.common.stunner.core.util.HashUtil;
 
 @Portable
 @Bindable
@@ -43,34 +42,34 @@ public class ReassignmentsInfo implements BPMNProperty {
 
     @Value
     @FieldValue
-    private String value;
+    private ReassignmentTypeListValue value;
 
     public ReassignmentsInfo() {
-        this("");
+
     }
 
-    public ReassignmentsInfo(@MapsTo("value")final String value) {
+    public ReassignmentsInfo(@MapsTo("value") final ReassignmentTypeListValue value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public ReassignmentTypeListValue getValue() {
         return value;
     }
 
-    public void setValue(final String value) {
+    public void setValue(final ReassignmentTypeListValue value) {
         this.value = value;
     }
 
     @Override
     public int hashCode() {
-        return HashUtil.combineHashCodes(Objects.hashCode(value));
+        return Objects.hashCode(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof ReassignmentsInfo) {
             ReassignmentsInfo other = (ReassignmentsInfo) o;
-            return (null != value) ? value.equals(other.value) : null == other.value;
+            return Objects.equals(value, other.value);
         }
         return false;
     }

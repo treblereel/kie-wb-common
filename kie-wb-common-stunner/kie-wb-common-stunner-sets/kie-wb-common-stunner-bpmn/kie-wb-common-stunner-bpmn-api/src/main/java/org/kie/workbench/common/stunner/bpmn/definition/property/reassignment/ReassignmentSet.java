@@ -60,10 +60,6 @@ public class ReassignmentSet implements BPMNPropertySet {
         this.reassignmentsInfo = reassignmentsInfo;
     }
 
-    public ReassignmentSet(final String reassignmentsInfo) {
-        this.reassignmentsInfo = new ReassignmentsInfo(reassignmentsInfo);
-    }
-
     public PropertyType getType() {
         return type;
     }

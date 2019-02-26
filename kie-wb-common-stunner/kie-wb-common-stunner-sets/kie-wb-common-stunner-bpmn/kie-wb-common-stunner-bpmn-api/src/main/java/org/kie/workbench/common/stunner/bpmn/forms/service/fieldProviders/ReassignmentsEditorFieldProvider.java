@@ -20,6 +20,7 @@ import javax.enterprise.inject.Model;
 
 import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.BasicTypeFieldProvider;
 import org.kie.workbench.common.forms.model.TypeInfo;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentTypeListValue;
 import org.kie.workbench.common.stunner.bpmn.forms.model.ReassignmentsEditorFieldDefinition;
 import org.kie.workbench.common.stunner.bpmn.forms.model.ReassignmentsEditorFieldType;
 
@@ -33,7 +34,7 @@ public class ReassignmentsEditorFieldProvider extends BasicTypeFieldProvider<Rea
 
     @Override
     protected void doRegisterFields() {
-        registerPropertyType(String.class);
+        registerPropertyType(ReassignmentTypeListValue.class);
     }
 
     @Override

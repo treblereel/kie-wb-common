@@ -16,12 +16,10 @@
 
 package org.kie.workbench.common.stunner.bpmn.backend.converters.tostunner.properties;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.bpmn2.Assignment;
 import org.eclipse.bpmn2.DataInput;
@@ -29,6 +27,7 @@ import org.eclipse.bpmn2.DataInputAssociation;
 import org.eclipse.bpmn2.FormalExpression;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties.ParsedReassignmentsInfos;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.fromstunner.associations.AssociationType;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentTypeListValue;
 import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentsInfo;
 
 import static java.util.Arrays.asList;
@@ -40,7 +39,7 @@ public class ReassignmentsInfos {
             AssociationType.NotStartedReassign.getName()));
 
     public static ReassignmentsInfo of(List<DataInputAssociation> dataInputAssociations) {
-        List<String> reassignments = new ArrayList<>();
+        ReassignmentTypeListValue reassignments = new ReassignmentTypeListValue();
         dataInputAssociations.forEach(din -> {
             DataInput targetRef = (DataInput) (din.getTargetRef());
             if (isReservedIdentifier(targetRef.getName())) {
@@ -50,17 +49,15 @@ public class ReassignmentsInfos {
                         String body = ((FormalExpression) assignment.getFrom()).getBody();
                         if (body != null) {
                             Arrays.stream(replaceBracket(body).split("\\^")).forEach(b -> {
-                                reassignments.add(ParsedReassignmentsInfos.of(assignment.getId(), targetRef.getName(), b));
+                                reassignments.addValue(ParsedReassignmentsInfos.of(assignment.getId(), targetRef.getName(), b));
                             });
                         }
                     }
                 }
             }
         });
-        if(reassignments.size() == 0){
-            return new ReassignmentsInfo();
-        }
-        return new ReassignmentsInfo("[" + reassignments.stream().collect(Collectors.joining(",")) + "]");
+
+        return new ReassignmentsInfo(reassignments);
     }
 
     public static boolean isReservedIdentifier(String targetName) {

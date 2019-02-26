@@ -30,7 +30,6 @@ import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.property.Type;
 import org.kie.workbench.common.stunner.core.definition.annotation.property.Value;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyType;
-import org.kie.workbench.common.stunner.core.util.HashUtil;
 
 @Portable
 @Bindable
@@ -43,13 +42,12 @@ public class NotificationsInfo implements BPMNProperty {
 
     @Value
     @FieldValue
-    private String value;
+    private NotificationTypeListValue value = new NotificationTypeListValue();
 
     public NotificationsInfo() {
-        this("");
     }
 
-    public NotificationsInfo(@MapsTo("value") final String value) {
+    public NotificationsInfo(@MapsTo("value") final NotificationTypeListValue value) {
         this.value = value;
     }
 
@@ -57,25 +55,27 @@ public class NotificationsInfo implements BPMNProperty {
         return type;
     }
 
-    public String getValue() {
+    public NotificationTypeListValue getValue() {
         return value;
     }
 
-    public void setValue(final String value) {
+
+    public void setValue(final NotificationTypeListValue value) {
         this.value = value;
     }
 
     @Override
     public int hashCode() {
-        return HashUtil.combineHashCodes(Objects.hashCode(value));
+        return Objects.hashCode(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof NotificationsInfo) {
             NotificationsInfo other = (NotificationsInfo) o;
-            return (null != value) ? value.equals(other.value) : null == other.value;
+            return Objects.equals(value, other.value);
         }
         return false;
     }
+
 }

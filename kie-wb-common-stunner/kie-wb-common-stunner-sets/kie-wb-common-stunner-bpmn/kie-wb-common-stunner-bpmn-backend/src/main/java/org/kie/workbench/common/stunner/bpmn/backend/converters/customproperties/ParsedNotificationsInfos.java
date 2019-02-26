@@ -16,26 +16,25 @@
 
 package org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.fromstunner.associations.AssociationType;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationTypeListValue;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationValue;
 
 public class ParsedNotificationsInfos {
 
-    Notification notification = new Notification();
+    NotificationValue notification = new NotificationValue();
 
-    public static String of(String type, String body){
-        return new ParsedNotificationsInfos(type, body).toJSON();
+    public static NotificationValue of(String type, String body){
+        return new ParsedNotificationsInfos(type, body).notification;
     }
 
     private ParsedNotificationsInfos(String type, String body){
-        notification.type = type;
+        notification.setType(type);
 
         if (body != null && !body.isEmpty()) {
             String temp;
@@ -57,53 +56,49 @@ public class ParsedNotificationsInfos {
         }
     }
 
-    public static String ofCDATA(String json, AssociationType type){
-        return new ParsedNotificationsInfos.CDATA(json, type).get();
+    public static String ofCDATA(NotificationTypeListValue values, AssociationType type){
+        return new ParsedNotificationsInfos.CDATA(values, type).get();
     }
 
     private static class CDATA {
-        private List<Notification>  notifications;
+        private List<NotificationValue>  notifications;
 
         private AssociationType type;
 
-        CDATA(String json, AssociationType type){
+        CDATA(NotificationTypeListValue value, AssociationType type){
             this.type = type;
-            notifications = new Gson().
-                    fromJson(json, new TypeToken<List<Notification>>(){}.getType());
+            notifications = value.getValues();
         }
+
         String get(){
-            return notifications.stream().filter(m -> m.type.equals(type.getName()))
+            return notifications.stream().filter(m -> m.getType().equals(type.getName()))
                     .map(m -> m.toCDATAFormat())
                     .collect(Collectors.joining("^"));
         }
     }
 
-    private String toJSON(){
-        return new Gson().toJson(notification);
+    private static void getFrom(NotificationValue notification, String body) {
+        notification.setFrom(parseElement(body, "from", 0));
     }
 
-    private static void getFrom(Notification notification, String body) {
-        notification.from = parseElement(body, "from", 0);
+    private static void getUsers(NotificationValue notification, String body) {
+        notification.setUsers(parseGroup(body, "tousers", 1));
     }
 
-    private static void getUsers(Notification notification, String body) {
-        notification.tousers = parseGroup(body, "tousers", 1);
+    private static void getGroups(NotificationValue notification, String body) {
+        notification.setGroups(parseGroup(body, "togroups", 2));
     }
 
-    private static void getGroups(Notification notification, String body) {
-        notification.togroups = parseGroup(body, "togroups", 2);
+    private static void getReplyTo(NotificationValue notification, String body) {
+        notification.setReplyTo(parseElement(body, "replyTo", 3));
     }
 
-    private static void getReplyTo(Notification notification, String body) {
-        notification.replyTo = parseElement(body, "replyTo", 3);
+    private static void getSubject(NotificationValue notification, String body) {
+        notification.setSubject(parseElement(body, "subject", 4));
     }
 
-    private static void getSubject(Notification notification, String body) {
-        notification.subject = parseElement(body, "subject", 4);
-    }
-
-    private static void getBody(Notification notification, String body) {
-        notification.body = parseElement(body, "body", 5);
+    private static void getBody(NotificationValue notification, String body) {
+        notification.setBody(parseElement(body, "body", 5));
     }
 
     private static String parseElement(String group, String type, int position) {
@@ -126,8 +121,8 @@ public class ParsedNotificationsInfos {
         return Collections.EMPTY_LIST;
     }
 
-    private static void parsePeriod(Notification notification, String part) {
-        notification.expiresAt = replaceBracket(part);
+    private static void parsePeriod(NotificationValue notification, String part) {
+        notification.setExpiresAt(replaceBracket(part));
 
     }
 
@@ -135,39 +130,4 @@ public class ParsedNotificationsInfos {
         return original.replaceFirst("\\[", "").replace("]", "");
     }
 
-    public static class Notification {
-
-        private String body;
-        private String expiresAt;
-        private String from;
-        private String replyTo;
-        private String subject;
-        private String type;
-        private List<String> tousers = new ArrayList<>();
-        private List<String> togroups = new ArrayList<>();
-
-        @Override
-        public String toString() {
-            return "Notification{" +
-                    ", type='" + type + '\'' +
-                    ", from='" + from + '\'' +
-                    ", replyTo='" + replyTo + '\'' +
-                    ", subject='" + subject + '\'' +
-                    ", body='" + body + '\'' +
-                    ", expiresAt='" + expiresAt + '\'' +
-                    ", users='" + tousers.stream().collect(Collectors.joining(", ")) + '\'' +
-                    ", groups='" + togroups.stream().collect(Collectors.joining(", ")) + '\'' +
-                    '}';
-        }
-
-        public String toCDATAFormat() {
-            return  "[from:" + from  +
-                    "|tousers:"+tousers.stream().collect(Collectors.joining(", "))+
-                    "|togroups:"+togroups.stream().collect(Collectors.joining(", ")) +
-                    "|replyTo:"+replyTo +
-                    "|subject:"+subject +
-                    "|body:"+body +
-                    "]@["+expiresAt+"]";
-        }
-    }
 }

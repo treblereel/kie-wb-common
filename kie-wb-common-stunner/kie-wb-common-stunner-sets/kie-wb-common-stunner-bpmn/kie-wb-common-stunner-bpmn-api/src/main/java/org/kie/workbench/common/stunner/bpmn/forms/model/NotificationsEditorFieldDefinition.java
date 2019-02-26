@@ -20,6 +20,7 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.forms.fields.shared.AbstractFieldDefinition;
 import org.kie.workbench.common.forms.model.FieldDefinition;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationTypeListValue;
 
 @Portable
 @Bindable
@@ -27,10 +28,8 @@ public class NotificationsEditorFieldDefinition extends AbstractFieldDefinition 
 
     public static final NotificationsEditorFieldType FIELD_TYPE = new NotificationsEditorFieldType();
 
-    private String defaultValue;
-
     public NotificationsEditorFieldDefinition() {
-        super(String.class.getName());
+        super(NotificationTypeListValue.class.getName());
     }
 
     @Override
@@ -38,18 +37,8 @@ public class NotificationsEditorFieldDefinition extends AbstractFieldDefinition 
         return FIELD_TYPE;
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
     @Override
     protected void doCopyFrom(FieldDefinition other) {
-        if (other instanceof NotificationsEditorFieldDefinition) {
-            this.setDefaultValue(((NotificationsEditorFieldDefinition) other).getDefaultValue());
-        }
+
     }
 }

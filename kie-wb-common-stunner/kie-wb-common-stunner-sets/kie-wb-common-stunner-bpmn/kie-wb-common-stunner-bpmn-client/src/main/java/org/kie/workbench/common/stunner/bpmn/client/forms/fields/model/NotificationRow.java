@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jboss.errai.databinding.client.api.Bindable;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationValue;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
 
 /**
@@ -30,12 +31,10 @@ import org.kie.workbench.common.stunner.core.util.HashUtil;
 @Bindable
 public class NotificationRow {
 
-    private long id;
-
     // Field which is incremented for each row.
     // Required to implement equals function which needs a unique field
     private static long lastId = 0;
-
+    private long id;
     private String body = "";
 
     private String expiresAt = "0h";
@@ -52,11 +51,11 @@ public class NotificationRow {
 
     private NotificationType type = NotificationType.NotCompletedNotify;
 
-    public NotificationRow(){
+    public NotificationRow() {
         this.id = lastId++;
     }
 
-    public NotificationRow(Notification notification){
+    public NotificationRow(NotificationValue notification) {
         this.id = lastId++;
         this.setType(NotificationType.get(notification.getType()));
         this.setExpiresAt(notification.getExpiresAt());
@@ -68,18 +67,17 @@ public class NotificationRow {
         this.setReplyTo(notification.getReplyTo());
     }
 
-    public NotificationRow clone(){
-        NotificationRow clone = new NotificationRow();
-        clone.setId(getId());
-        clone.setExpiresAt(getExpiresAt());
-        clone.setType(getType());
-        clone.setGroups(getGroups());
-        clone.setUsers(getUsers());
-        clone.setFrom(getFrom());
-        clone.setReplyTo(getReplyTo());
-        clone.setSubject(getSubject());
-        clone.setBody(getBody());
-        return clone;
+    public NotificationValue toNotificationValue() {
+        NotificationValue value = new NotificationValue();
+        value.setType(getType().getAlias());
+        value.setExpiresAt(getExpiresAt());
+        value.setGroups(getGroups().stream().collect(Collectors.toList()));
+        value.setUsers(getUsers().stream().collect(Collectors.toList()));
+        value.setBody(getBody());
+        value.setSubject(getSubject());
+        value.setFrom(getFrom());
+        value.setReplyTo(getReplyTo());
+        return value;
     }
 
     public long getId() {
@@ -88,27 +86,6 @@ public class NotificationRow {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        NotificationRow other = (NotificationRow) obj;
-        return (id == other.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return HashUtil.combineHashCodes(super.hashCode(),
-                Objects.hashCode(id));
     }
 
     public String getBody() {
@@ -173,6 +150,41 @@ public class NotificationRow {
 
     public void setType(NotificationType type) {
         this.type = type;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashUtil.combineHashCodes(super.hashCode(),
+                Objects.hashCode(id));
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        NotificationRow other = (NotificationRow) obj;
+        return (id == other.getId());
+    }
+
+    public NotificationRow clone() {
+        NotificationRow clone = new NotificationRow();
+        clone.setId(getId());
+        clone.setExpiresAt(getExpiresAt());
+        clone.setType(getType());
+        clone.setGroups(getGroups());
+        clone.setUsers(getUsers());
+        clone.setFrom(getFrom());
+        clone.setReplyTo(getReplyTo());
+        clone.setSubject(getSubject());
+        clone.setBody(getBody());
+        return clone;
     }
 
     @Override

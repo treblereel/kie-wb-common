@@ -20,6 +20,7 @@ import javax.enterprise.inject.Model;
 
 import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.BasicTypeFieldProvider;
 import org.kie.workbench.common.forms.model.TypeInfo;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationTypeListValue;
 import org.kie.workbench.common.stunner.bpmn.forms.model.NotificationsEditorFieldDefinition;
 import org.kie.workbench.common.stunner.bpmn.forms.model.NotificationsEditorFieldType;
 
@@ -33,7 +34,7 @@ public class NotificationsEditorFieldProvider extends BasicTypeFieldProvider<Not
 
     @Override
     protected void doRegisterFields() {
-        registerPropertyType(String.class);
+        registerPropertyType(NotificationTypeListValue.class);
     }
 
     @Override

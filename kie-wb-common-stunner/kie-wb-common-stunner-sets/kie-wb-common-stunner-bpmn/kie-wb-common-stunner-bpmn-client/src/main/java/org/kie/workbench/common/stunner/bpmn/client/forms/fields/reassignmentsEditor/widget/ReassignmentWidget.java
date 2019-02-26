@@ -30,9 +30,10 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.i18n.StunnerBPMNConstants;
-import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.Reassignment;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.ReassignmentRow;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.reassignmentsEditor.ReassignmentsEditorWidget;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentTypeListValue;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentValue;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 
 @Dependent
@@ -107,11 +108,11 @@ public class ReassignmentWidget implements IsWidget, ReassignmentWidgetView.Pres
     @Override
     public void save() {
         if (callback != null) {
-           List<String> reassignments =  getValue()
+           List<ReassignmentValue> reassignments =  getValue()
                     .stream()
-                    .map( row -> new Reassignment(row).toString())
+                    .map( row -> row.toReassignmentValue())
                     .collect(Collectors.toList());
-            callback.getData("["+reassignments.stream().collect(Collectors.joining(",")) +"]");
+            callback.getData(new ReassignmentTypeListValue(reassignments));
         }
         view.hide();
     }

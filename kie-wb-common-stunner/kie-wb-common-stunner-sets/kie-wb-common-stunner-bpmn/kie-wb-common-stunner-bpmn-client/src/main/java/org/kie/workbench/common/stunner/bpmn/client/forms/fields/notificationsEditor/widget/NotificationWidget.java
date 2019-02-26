@@ -30,9 +30,10 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.i18n.StunnerBPMNConstants;
-import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.Notification;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.NotificationRow;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.notificationsEditor.NotificationsEditorWidget;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationTypeListValue;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationValue;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 
 @Dependent
@@ -127,11 +128,11 @@ public class NotificationWidget implements IsWidget, NotificationWidgetView.Pres
     @Override
     public void save() {
         if (callback != null) {
-           List<String> reassignments =  getValue()
+           List<NotificationValue> notifications =  getValue()
                     .stream()
-                    .map( row -> new Notification(row).toString())
+                    .map( row -> row.toNotificationValue())
                     .collect(Collectors.toList());
-            callback.getData("["+reassignments.stream().collect(Collectors.joining(",")) +"]");
+            callback.getData(new NotificationTypeListValue(notifications));
         }
         view.hide();
     }

@@ -16,30 +16,29 @@
 
 package org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.fromstunner.associations.AssociationType;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentTypeListValue;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentValue;
 
 public class ParsedReassignmentsInfos {
-    Reassignment reassignment = new Reassignment();
 
-    public static String of(String id, String type, String body){
-        return new ParsedReassignmentsInfos(id, type, body).toJSON();
+    ReassignmentValue reassignment = new ReassignmentValue();
+
+    public static ReassignmentValue of(String id, String type, String body){
+        return new ParsedReassignmentsInfos(type, body).reassignment;
     }
 
-    public static String ofCDATA(String json, AssociationType type){
-        return new CDATA(json, type).get();
+    public static String ofCDATA(ReassignmentTypeListValue value, AssociationType type){
+        return new CDATA(value, type).get();
     }
 
-    private ParsedReassignmentsInfos(String id, String type, String body){
-        reassignment.id = id;
-        reassignment.type = type;
+    private ParsedReassignmentsInfos(String type, String body){
+        reassignment.setType(type);
 
         if (body != null && !body.isEmpty()) {
             String usersAndGroups;
@@ -58,16 +57,12 @@ public class ParsedReassignmentsInfos {
 
     }
 
-    private String toJSON(){
-        return new Gson().toJson(reassignment);
+    private static void getUsers(ReassignmentValue reassignment, String usersAndGroups) {
+        reassignment.setUsers(parseGroup(usersAndGroups, "users", 0));
     }
 
-    private static void getUsers(Reassignment reassignment, String usersAndGroups) {
-        reassignment.users = parseGroup(usersAndGroups, "users", 0);
-    }
-
-    private static void getGroups(Reassignment reassignment, String usersAndGroups) {
-        reassignment.groups = parseGroup(usersAndGroups, "groups", 1);
+    private static void getGroups(ReassignmentValue reassignment, String usersAndGroups) {
+        reassignment.setGroups(parseGroup(usersAndGroups, "groups", 1));
     }
 
     private static List<String> parseGroup(String group, String type, int position) {
@@ -81,8 +76,8 @@ public class ParsedReassignmentsInfos {
         return Collections.EMPTY_LIST;
     }
 
-    private static void parsePeriod(Reassignment reassignment, String part) {
-        reassignment.period = replaceBracket(part);
+    private static void parsePeriod(ReassignmentValue reassignment, String part) {
+        reassignment.setDuration(replaceBracket(part));
 
     }
 
@@ -91,45 +86,20 @@ public class ParsedReassignmentsInfos {
     }
 
     private static class CDATA {
-        private List<ParsedReassignmentsInfos.Reassignment>  reassignments;
+        private List<ReassignmentValue>  reassignments;
 
         private AssociationType type;
 
-        CDATA(String json, AssociationType type){
+        CDATA(ReassignmentTypeListValue value, AssociationType type){
             this.type = type;
-            reassignments = new Gson().
-                    fromJson(json, new TypeToken<List<Reassignment>>(){}.getType());
+            reassignments = value.getValues();
         }
 
         String get(){
-            return reassignments.stream().filter(m -> m.type.equals(type.getName()))
+            return reassignments.stream().filter(m -> m.getType().equals(type.getName()))
                     .map(m -> m.toCDATAFormat())
                     .collect(Collectors.joining("^"));
         }
     }
 
-    public static class Reassignment {
-        public String id;
-        public String type;
-        public String period;
-        public List<String> users = new ArrayList<>();
-        public List<String> groups = new ArrayList<>();
-
-        @Override
-        public String toString() {
-            return "Reassignment{" +
-                    "id='" + id + '\'' +
-                    ", type='" + type + '\'' +
-                    ", period='" + period + '\'' +
-                    ", users='" + users.stream().collect(Collectors.joining(", ")) + '\'' +
-                    ", groups='" + groups.stream().collect(Collectors.joining(", ")) + '\'' +
-                    '}';
-        }
-
-        public String toCDATAFormat() {
-            return "[users:"+users.stream().collect(Collectors.joining(", "))+
-                   "|groups:"+groups.stream().collect(Collectors.joining(", ")) +"]"+
-                    "@["+period+"]";
-        }
-    }
 }

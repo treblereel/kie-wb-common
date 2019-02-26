@@ -16,8 +16,6 @@
 
 package org.kie.workbench.common.stunner.bpmn.client.forms.fields.notificationsEditor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -27,39 +25,35 @@ import javax.inject.Inject;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
-import org.jboss.errai.common.client.dom.Button;
-import org.jboss.errai.common.client.dom.TextInput;
+import elemental2.dom.HTMLButtonElement;
+import elemental2.dom.HTMLInputElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.Notification;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.NotificationRow;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.notificationsEditor.widget.NotificationWidget;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationTypeListValue;
 
 @Dependent
 @Templated
-public class NotificationsEditorWidget extends Composite implements HasValue<String> {
+public class NotificationsEditorWidget extends Composite implements HasValue<NotificationTypeListValue> {
 
 
     private NotificationsEditorWidget.GetNotificationsCallback callback = null;
 
-    private String notificationInfo;
+    private NotificationTypeListValue notificationTypeListValue = new NotificationTypeListValue();
 
     @Inject
     @DataField
-    private Button notificationButton;
+    private HTMLButtonElement notificationButton;
 
     @Inject
     private NotificationWidget notificationWidget;
 
     @Inject
     @DataField
-    private TextInput notificationTextBox;
-
-    private List<Notification> notifications = new ArrayList<>();
+    private HTMLInputElement notificationTextBox;
 
     @PostConstruct
     public void init() {
@@ -67,63 +61,56 @@ public class NotificationsEditorWidget extends Composite implements HasValue<Str
         notificationTextBox.addEventListener("click", event -> showNotificationsDialog(), false);
     }
 
-    @Override
-    public String getValue() {
-        return notificationInfo;
-    }
-
-    @Override
-    public void setValue(String json) {
-        setValue(json,
-                false);
-    }
-
-    private void updateNotification(String json) {
-        JSONArray array = JSONParser.parseStrict(json).isArray();
-        notifications.clear();
-        for (int i = 0; i < array.size(); i++) {
-            notifications.add(Notification.fromJSONObject(array.get(i).isObject()));
-        }
-    }
-
-    @Override
-    public void setValue(String json, boolean fireEvents) {
-        if (json != null && !json.isEmpty()) {
-            updateNotification(json);
-        }
-        String oldValue = notificationInfo;
-        notificationInfo = json;
-        initTextBox();
-        if (fireEvents) {
-            ValueChangeEvent.fireIfNotEqual(this,
-                    oldValue,
-                    notificationInfo);
-        }
-    }
-
-    private void initTextBox() {
-        if (notifications == null) {
-            notificationTextBox.setValue("empty");
-        } else {
-            notificationTextBox.setValue("{" + notifications.size() + " } notifications");
-        }
-    }
-
-    @Override
-    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-        return addHandler(handler,
-                ValueChangeEvent.getType());
-    }
-
     private void showNotificationsDialog() {
-        notificationWidget.setValue(notifications
+        notificationWidget.setValue(notificationTypeListValue.getValues()
                 .stream(
                 ).map(r -> new NotificationRow(r))
                 .collect(Collectors.toList()), true);
 
-        notificationWidget.setCallback(reassignmentsData -> setValue(reassignmentsData,
+        notificationWidget.setCallback(data -> setValue(data,
                 true));
         notificationWidget.show();
+    }
+
+    @Override
+    public void setValue(NotificationTypeListValue value, boolean fireEvents) {
+        if (value != null) {
+            NotificationTypeListValue oldValue = notificationTypeListValue;
+            notificationTypeListValue = value;
+            initTextBox();
+            if (fireEvents) {
+                ValueChangeEvent.fireIfNotEqual(this,
+                        oldValue,
+                        notificationTypeListValue);
+            }
+        }
+    }
+
+    private void initTextBox() {
+        if (notificationTypeListValue == null) {
+            notificationTextBox.value = "zero notifications";
+        } else {
+            notificationTextBox.value = notificationTypeListValue.getValues().size() + " notifications";
+        }
+    }
+
+    @Override
+    public NotificationTypeListValue getValue() {
+        return notificationTypeListValue;
+    }
+
+    @Override
+    public void setValue(NotificationTypeListValue value) {
+        if (value != null) {
+            setValue(value,
+                    false);
+        }
+    }
+
+    @Override
+    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<NotificationTypeListValue> handler) {
+        return addHandler(handler,
+                ValueChangeEvent.getType());
     }
 
     public void setReadOnly(final boolean readOnly) {
@@ -136,6 +123,6 @@ public class NotificationsEditorWidget extends Composite implements HasValue<Str
      */
     public interface GetNotificationsCallback {
 
-        void getData(String notificationData);
+        void getData(NotificationTypeListValue value);
     }
 }

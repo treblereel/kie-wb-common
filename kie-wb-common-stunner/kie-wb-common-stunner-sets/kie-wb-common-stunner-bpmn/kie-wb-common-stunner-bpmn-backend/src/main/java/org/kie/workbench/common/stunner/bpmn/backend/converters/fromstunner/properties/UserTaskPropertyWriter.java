@@ -32,7 +32,9 @@ import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties
 import org.kie.workbench.common.stunner.bpmn.backend.converters.fromstunner.associations.AssociationType;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.tostunner.properties.Scripts;
 import org.kie.workbench.common.stunner.bpmn.definition.property.assignee.Actors;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationTypeListValue;
 import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationsInfo;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentTypeListValue;
 import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentsInfo;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.OnEntryAction;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.OnExitAction;
@@ -147,7 +149,7 @@ public class UserTaskPropertyWriter extends MultipleInstanceActivityPropertyWrit
     }
 
     public void setReassignments(ReassignmentsInfo reassignments){
-        fromReassignmentString(reassignments.getValue());
+        fromReassignment(reassignments.getValue());
     }
 
     private List<String> fromActorString(String delimitedActors) {
@@ -159,10 +161,10 @@ public class UserTaskPropertyWriter extends MultipleInstanceActivityPropertyWrit
         }
     }
 
-    private void fromReassignmentString(String json) {
-        if(json != null && !json.isEmpty()){
-            notStartedReassign.set(ParsedReassignmentsInfos.ofCDATA(json, AssociationType.NotStartedReassign));
-            notCompletedReassign.set(ParsedReassignmentsInfos.ofCDATA(json, AssociationType.NotCompletedReassign));
+    private void fromReassignment(ReassignmentTypeListValue value) {
+        if(value != null && !value.getValues().isEmpty()){
+            notStartedReassign.set(ParsedReassignmentsInfos.ofCDATA(value, AssociationType.NotStartedReassign));
+            notCompletedReassign.set(ParsedReassignmentsInfos.ofCDATA(value, AssociationType.NotCompletedReassign));
         }
     }
 
@@ -187,13 +189,13 @@ public class UserTaskPropertyWriter extends MultipleInstanceActivityPropertyWrit
     }
 
     public void setNotifications(NotificationsInfo notificationsInfo) {
-        fromNotificationString(notificationsInfo.getValue());
+        fromNotification(notificationsInfo.getValue());
     }
 
-    private void fromNotificationString(String json) {
-        if(json != null && !json.isEmpty()){
-            notStartedNotify.set(ParsedNotificationsInfos.ofCDATA(json, AssociationType.NotStartedNotify));
-            notCompletedNotify.set(ParsedNotificationsInfos.ofCDATA(json, AssociationType.NotCompletedNotify));
+    private void fromNotification(NotificationTypeListValue value) {
+        if(value != null && !value.getValues().isEmpty()){
+            notStartedNotify.set(ParsedNotificationsInfos.ofCDATA(value, AssociationType.NotStartedNotify));
+            notCompletedNotify.set(ParsedNotificationsInfos.ofCDATA(value, AssociationType.NotCompletedNotify));
         }
     }
 }

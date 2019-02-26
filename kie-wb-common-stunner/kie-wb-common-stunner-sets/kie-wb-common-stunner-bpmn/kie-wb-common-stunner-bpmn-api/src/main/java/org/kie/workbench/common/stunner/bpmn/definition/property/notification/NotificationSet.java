@@ -54,10 +54,6 @@ public class NotificationSet implements BPMNPropertySet {
         this.notificationsInfo = notificationsInfo;
     }
 
-    public NotificationSet(final String notificationsInfo) {
-        this.notificationsInfo = new NotificationsInfo(notificationsInfo);
-    }
-
     public NotificationsInfo getNotificationsInfo() {
         return notificationsInfo;
     }

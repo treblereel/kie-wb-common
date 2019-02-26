@@ -36,7 +36,6 @@ public class ReassignmentsEditorFieldInitializer implements FieldInitializer<Rea
     public void initialize(ReassignmentsEditorFieldDefinition field,
                            FieldElement fieldElement,
                            FormGenerationContext context) {
-        field.setDefaultValue(fieldElement.getParams().getOrDefault("defaultValue",
-                ""));
+
     }
 }

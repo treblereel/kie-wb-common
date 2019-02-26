@@ -36,8 +36,6 @@ public class NotificationsEditorFieldInitializer implements FieldInitializer<Not
     public void initialize(NotificationsEditorFieldDefinition field,
                            FieldElement fieldElement,
                            FormGenerationContext context) {
-        field.setDefaultValue(fieldElement.getParams().getOrDefault("defaultValue",
-                ""));
     }
 }
 

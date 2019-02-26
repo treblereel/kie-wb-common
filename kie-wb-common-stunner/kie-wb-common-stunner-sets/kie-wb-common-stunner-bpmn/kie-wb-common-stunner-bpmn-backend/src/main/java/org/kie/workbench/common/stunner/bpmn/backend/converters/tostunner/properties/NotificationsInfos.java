@@ -16,12 +16,10 @@
 
 package org.kie.workbench.common.stunner.bpmn.backend.converters.tostunner.properties;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.bpmn2.Assignment;
 import org.eclipse.bpmn2.DataInput;
@@ -29,6 +27,7 @@ import org.eclipse.bpmn2.DataInputAssociation;
 import org.eclipse.bpmn2.FormalExpression;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties.ParsedNotificationsInfos;
 import org.kie.workbench.common.stunner.bpmn.backend.converters.fromstunner.associations.AssociationType;
+import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationTypeListValue;
 import org.kie.workbench.common.stunner.bpmn.definition.property.notification.NotificationsInfo;
 
 import static java.util.Arrays.asList;
@@ -40,7 +39,7 @@ public class NotificationsInfos {
             AssociationType.NotStartedNotify.getName()));
 
     public static NotificationsInfo of(List<DataInputAssociation> dataInputAssociations) {
-        List<String> notifications = new ArrayList<>();
+        NotificationTypeListValue notifications = new NotificationTypeListValue();
         dataInputAssociations.forEach(din -> {
             DataInput targetRef = (DataInput) (din.getTargetRef());
             if (isReservedIdentifier(targetRef.getName())) {
@@ -50,17 +49,15 @@ public class NotificationsInfos {
                         String body = ((FormalExpression) assignment.getFrom()).getBody();
                         if (body != null) {
                             Arrays.stream(replaceBracket(body).split("\\^")).forEach(b -> {
-                                notifications.add(ParsedNotificationsInfos.of(targetRef.getName(), b));
+                                notifications.addValue(ParsedNotificationsInfos.of(targetRef.getName(), b));
                             });
                         }
                     }
                 }
             }
         });
-        if(notifications.size() == 0){
-            return new NotificationsInfo();
-        }
-        return new NotificationsInfo("[" + notifications.stream().collect(Collectors.joining(",")) + "]");
+
+        return new NotificationsInfo(notifications);
     }
 
     public static boolean isReservedIdentifier(String targetName) {

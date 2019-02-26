@@ -20,6 +20,7 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.forms.fields.shared.AbstractFieldDefinition;
 import org.kie.workbench.common.forms.model.FieldDefinition;
+import org.kie.workbench.common.stunner.bpmn.definition.property.reassignment.ReassignmentTypeListValue;
 
 @Portable
 @Bindable
@@ -27,10 +28,8 @@ public class ReassignmentsEditorFieldDefinition extends AbstractFieldDefinition 
 
     public static final ReassignmentsEditorFieldType FIELD_TYPE = new ReassignmentsEditorFieldType();
 
-    private String defaultValue;
-
     public ReassignmentsEditorFieldDefinition() {
-        super(String.class.getName());
+        super(ReassignmentTypeListValue.class.getName());
     }
 
     @Override
@@ -38,18 +37,8 @@ public class ReassignmentsEditorFieldDefinition extends AbstractFieldDefinition 
         return FIELD_TYPE;
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
     @Override
     protected void doCopyFrom(FieldDefinition other) {
-        if (other instanceof ReassignmentsEditorFieldDefinition) {
-            this.setDefaultValue(((ReassignmentsEditorFieldDefinition) other).getDefaultValue());
-        }
+
     }
 }

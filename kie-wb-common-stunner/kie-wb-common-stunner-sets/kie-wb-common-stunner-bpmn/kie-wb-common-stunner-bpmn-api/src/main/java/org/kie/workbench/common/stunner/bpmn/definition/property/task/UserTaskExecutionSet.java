@@ -503,7 +503,7 @@ public class UserTaskExecutionSet implements BaseUserTaskExecutionSet {
                                          Objects.hashCode(groupid),
                                          Objects.hashCode(assignmentsinfo),
                                          Objects.hashCode(notificationsInfo),
-                                         Objects.hashCode(reassignmentsInfo),
+                                         //Objects.hashCode(reassignmentsInfo),
                                          Objects.hashCode(isAsync),
                                          Objects.hashCode(skippable),
                                          Objects.hashCode(priority),
@@ -535,7 +535,7 @@ public class UserTaskExecutionSet implements BaseUserTaskExecutionSet {
                     Objects.equals(groupid, other.groupid) &&
                     Objects.equals(assignmentsinfo, other.assignmentsinfo) &&
                     Objects.equals(notificationsInfo, other.notificationsInfo) &&
-                    Objects.equals(reassignmentsInfo, other.reassignmentsInfo) &&
+                    //Objects.equals(reassignmentsInfo, other.reassignmentsInfo) &&
                     Objects.equals(isAsync, other.isAsync) &&
                     Objects.equals(skippable, other.skippable) &&
                     Objects.equals(priority, other.priority) &&
