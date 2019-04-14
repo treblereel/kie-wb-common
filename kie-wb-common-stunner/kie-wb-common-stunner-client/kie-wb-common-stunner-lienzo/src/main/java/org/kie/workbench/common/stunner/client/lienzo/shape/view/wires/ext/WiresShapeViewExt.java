@@ -140,9 +140,19 @@ public class WiresShapeViewExt<T extends WiresShapeViewExt>
     }
 
     @Override
+    public Double getTitleXOffsetPosition() {
+        return textViewDecorator.getTitleXOffsetPosition();
+    }
+
+    @Override
     public T setTitleYOffsetPosition(final Double yOffset) {
         textViewDecorator.setTitleYOffsetPosition(yOffset);
         return cast();
+    }
+
+    @Override
+    public Double getTitleYOffsetPosition() {
+        return textViewDecorator.getTitleYOffsetPosition();
     }
 
     @Override

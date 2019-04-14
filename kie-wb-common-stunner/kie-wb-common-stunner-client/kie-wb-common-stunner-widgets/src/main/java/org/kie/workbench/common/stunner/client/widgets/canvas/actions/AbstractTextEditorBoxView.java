@@ -83,9 +83,6 @@ public abstract class AbstractTextEditorBoxView<T extends TextEditorBoxView.Pres
                     presenter.onClose();
                 }
                 break;
-            case Event.ONMOUSEOVER:
-                editNameBox.focus();
-                break;
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.core.client.canvas.controls.actions;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import com.google.gwt.core.client.GWT;
@@ -28,40 +29,37 @@ import org.kie.workbench.common.stunner.core.client.components.views.FloatingVie
 import org.kie.workbench.common.stunner.core.graph.Element;
 
 @Dependent
-@SingleLineTextEditorBox
-public class CanvasInPlaceTextEditorControlSingleLine
-        extends AbstractCanvasInPlaceTextEditorControl {
+@Default
+@InLineTextEditorBox
+public class CanvasInPlaceTextEditorControlInLine extends AbstractCanvasInPlaceTextEditorControl {
 
     private final FloatingView<IsWidget> floatingView;
     private final TextEditorBox<AbstractCanvasHandler, Element> textEditorBox;
     private final Event<CanvasSelectionEvent> canvasSelectionEvent;
 
     @Inject
-    public CanvasInPlaceTextEditorControlSingleLine(final FloatingView<IsWidget> floatingView,
-                                                    final @SingleLineTextEditorBox TextEditorBox<AbstractCanvasHandler, Element> textEditorBox,
-                                                    final Event<CanvasSelectionEvent> canvasSelectionEvent) {
+    public CanvasInPlaceTextEditorControlInLine(final FloatingView<IsWidget> floatingView,
+                                                final @InLineTextEditorBox TextEditorBox<AbstractCanvasHandler, Element> textEditorBox,
+                                                final Event<CanvasSelectionEvent> canvasSelectionEvent) {
         this.floatingView = floatingView;
         this.textEditorBox = textEditorBox;
         this.canvasSelectionEvent = canvasSelectionEvent;
+
+        GWT.log("? " + floatingView.getClass().getCanonicalName());
     }
 
     @Override
     protected FloatingView<IsWidget> getFloatingView() {
-        GWT.log("CanvasInPlaceTextEditorControlSingleLine getFloatingView");
-
         return floatingView;
     }
 
     @Override
     protected TextEditorBox<AbstractCanvasHandler, Element> getTextEditorBox() {
-        GWT.log("CanvasInPlaceTextEditorControlSingleLine getTextEditorBox " + textEditorBox.getClass().getCanonicalName());
         return textEditorBox;
     }
 
     @Override
     protected Event<CanvasSelectionEvent> getCanvasSelectionEvent() {
-        GWT.log("CanvasInPlaceTextEditorControlSingleLine getCanvasSelectionEvent");
-
         return canvasSelectionEvent;
     }
 }

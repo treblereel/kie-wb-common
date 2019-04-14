@@ -19,6 +19,7 @@ package org.kie.workbench.common.stunner.core.client.canvas.controls.actions;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.dom.HTMLElement;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
@@ -49,6 +50,7 @@ import org.kie.workbench.common.stunner.core.graph.Element;
 import org.uberfire.mvp.Command;
 
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
+import static org.uberfire.client.views.pfly.selectpicker.JQuery.$;
 
 public abstract class AbstractCanvasInPlaceTextEditorControl
         extends AbstractCanvasHandlerRegistrationControl<AbstractCanvasHandler>
@@ -104,10 +106,22 @@ public abstract class AbstractCanvasInPlaceTextEditorControl
                 if (shapeView instanceof HasEventHandlers) {
                     final HasEventHandlers hasEventHandlers = (HasEventHandlers) shapeView;
                     if (hasEventHandlers.supports(ViewEventType.TEXT_DBL_CLICK)) {
+
+                        GWT.log(" class " + shape.getShapeView().getClass().getCanonicalName() + " " + (shape.getShapeView() instanceof HasTitle));
+
+                        GWT.log("AbstractCanvasInPlaceTextEditorControl " + AbstractCanvasInPlaceTextEditorControl.this.getClass().getCanonicalName());
+
+                        if (shape.getShapeView() instanceof HasTitle) {
+                            HasTitle hasTitle = (HasTitle) shape.getShapeView();
+
+                            GWT.log("X " + hasTitle.getTitleXOffsetPosition());
+                            GWT.log("Y " + hasTitle.getTitleYOffsetPosition());
+                        }
                         final TextDoubleClickHandler clickHandler = new TextDoubleClickHandler() {
                             @Override
                             public void handle(final TextDoubleClickEvent event) {
                                 AbstractCanvasInPlaceTextEditorControl.this.show(element,
+                                                                                 (HasTitle) shape.getShapeView(),
                                                                                  event.getClientX(),
                                                                                  event.getClientY());
                             }
@@ -150,8 +164,38 @@ public abstract class AbstractCanvasInPlaceTextEditorControl
 
     @Override
     public CanvasInPlaceTextEditorControl<AbstractCanvasHandler, EditorSession, Element> show(final Element item,
+                                                                                              final HasTitle shape,
                                                                                               final double x,
                                                                                               final double y) {
+
+        double left = $(".canvas-panel").offset().left;
+        double top = $(".canvas-panel").offset().top;
+
+        GWT.log("offset " + left + " " + top);
+
+        final Shape<?> shapez = getShape(item.getUUID());
+
+        GWT.log("shape " + shapez.getShapeView().getShapeX() + " " + shapez.getShapeView().getShapeY());
+
+        GWT.log("1 getCanonicalName " + item.getClass().getCanonicalName() + " " + shape.getClass().getCanonicalName());
+        GWT.log("1 X " + x + " " + shape.getTitleXOffsetPosition());
+        GWT.log("1 Y " + y + " " + shape.getTitleYOffsetPosition());
+        GWT.log("getShapeAbsoluteLocation x " + x + " " + shapez.getShapeView().getShapeAbsoluteLocation().getX());
+        GWT.log("getShapeAbsoluteLocation y " + y + " " + shapez.getShapeView().getShapeAbsoluteLocation().getY());
+        GWT.log("1 Y " + y + " " + shape.getTitleYOffsetPosition());
+
+/*        final Shape<?> alt = getShape(item.getUUID());
+
+        GWT.log("2 X " + ((HasTitle) alt).getTitleXOffsetPosition());
+        GWT.log("2 Y " + ((HasTitle) alt).getTitleYOffsetPosition());*/
+
+/*        if (getShape(item.getUUID()) instanceof HasTitle) {
+            HasTitle hasTitle = (HasTitle) getShape(item.getUUID());
+
+            GWT.log("1 X " + x);
+            GWT.log("1 Y " + y);
+        }*/
+
         if (getTextEditorBox().isVisible()) {
             flush();
         }
@@ -160,12 +204,44 @@ public abstract class AbstractCanvasInPlaceTextEditorControl
         getTextEditorBox().show(item);
         final double offsetX = getTextEditorBox().getDisplayOffsetX();
         final double offsetY = getTextEditorBox().getDisplayOffsetY();
+
         getFloatingView()
-                .setX(x)
-                .setY(y)
-                .setOffsetX(-offsetX)
-                .setOffsetY(-offsetY)
+                .setX(shapez.getShapeView().getShapeX())
+                .setY(shapez.getShapeView().getShapeY())
+                .setOffsetX((left + offsetX) + shape.getTitleXOffsetPosition())
+                .setOffsetY((top + offsetY) + shape.getTitleYOffsetPosition())
                 .show();
+
+        GWT.log("* x " + x + " " + shapez.getShapeView().getShapeAbsoluteLocation().getX() + " " + offsetX + " " + shape.getTitleXOffsetPosition());
+        GWT.log("* y " + y + " " + shapez.getShapeView().getShapeAbsoluteLocation().getY() + " " + shapez.getShapeView().getShapeY() + " " + offsetY + " " + shape.getTitleYOffsetPosition());
+
+
+
+
+/*        getFloatingView()
+                .setX(shapez.getShapeView().getShapeAbsoluteLocation().getX())
+                .setY(shapez.getShapeView().getShapeAbsoluteLocation().getY())
+                .setOffsetX(0)
+                .setOffsetY(-(offsetY+20))
+                .show();*/
+
+
+
+/*        if (shape instanceof HasTitle) {
+
+            getFloatingView()
+                    .setX(x)
+                    .setY(y)
+                    //.setOffsetX(-(offsetX - shape.getTitleXOffsetPosition() + 20))
+                    .setOffsetX(-(offsetX - shape.getTitleXOffsetPosition()))
+                    //.setOffsetY(-(offsetY - shape.getTitleYOffsetPosition()) - 20)
+                    .setOffsetY(-(offsetY - shape.getTitleYOffsetPosition()))
+                    .show();
+
+            GWT.log("3 X " + shape.getTitleXOffsetPosition() + " " + offsetX + " result " + (offsetX + 20));
+            GWT.log("3 Y " + shape.getTitleYOffsetPosition() + " " + offsetY + " result " + (offsetY - 20));
+        }*/
+
         return this;
     }
 

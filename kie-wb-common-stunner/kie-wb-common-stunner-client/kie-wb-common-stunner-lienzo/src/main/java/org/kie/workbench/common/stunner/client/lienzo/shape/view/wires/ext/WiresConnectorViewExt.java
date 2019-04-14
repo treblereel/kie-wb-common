@@ -151,9 +151,21 @@ public class WiresConnectorViewExt<T>
     }
 
     @Override
+    public Double getTitleXOffsetPosition() {
+        // Do not apply here...
+        return 0d;
+    }
+
+    @Override
     public T setTitleYOffsetPosition(final Double yOffset) {
         // Do not apply here...
         return cast();
+    }
+
+    @Override
+    public Double getTitleYOffsetPosition() {
+        // Do not apply here...
+        return 0d;
     }
 
     @Override

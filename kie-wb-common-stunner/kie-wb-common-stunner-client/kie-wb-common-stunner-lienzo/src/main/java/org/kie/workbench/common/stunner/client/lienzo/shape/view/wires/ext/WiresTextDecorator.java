@@ -38,6 +38,7 @@ import com.ait.lienzo.client.core.shape.wires.layout.size.SizeConstraints;
 import com.ait.lienzo.client.core.shape.wires.layout.size.SizeConstraints.Type;
 import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.shared.core.types.TextAlign;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerRegistration;
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.ViewEventHandlerManager;
 import org.kie.workbench.common.stunner.core.client.shape.TextWrapperStrategy;
@@ -162,6 +163,8 @@ public class WiresTextDecorator implements HasTitle<WiresTextDecorator> {
     }
 
     private void registerTextEnterHandler() {
+        GWT.log("registerTextEnterHandler " + text.getText());
+
         HandlerRegistration registration = text.addNodeMouseEnterHandler(event -> {
             if (null != textOverHandlerViewHandler && hasText()) {
                 final TextEnterEvent textOverEvent = new TextEnterEvent(event.getX(),
@@ -268,9 +271,19 @@ public class WiresTextDecorator implements HasTitle<WiresTextDecorator> {
     }
 
     @Override
+    public Double getTitleXOffsetPosition() {
+        return text.getX();
+    }
+
+    @Override
     public WiresTextDecorator setTitleYOffsetPosition(final Double yOffset) {
         this.text.setY(yOffset);
         return this;
+    }
+
+    @Override
+    public Double getTitleYOffsetPosition() {
+        return text.getY();
     }
 
     @Override

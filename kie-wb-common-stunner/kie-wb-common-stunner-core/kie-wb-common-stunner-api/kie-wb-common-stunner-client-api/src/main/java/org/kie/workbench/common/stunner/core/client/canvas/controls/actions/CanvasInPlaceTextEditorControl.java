@@ -21,6 +21,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.CanvasContro
 import org.kie.workbench.common.stunner.core.client.canvas.controls.CanvasRegistrationControl;
 import org.kie.workbench.common.stunner.core.client.command.RequiresCommandManager;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
+import org.kie.workbench.common.stunner.core.client.shape.view.HasTitle;
 import org.kie.workbench.common.stunner.core.graph.Element;
 
 /**
@@ -32,6 +33,7 @@ public interface CanvasInPlaceTextEditorControl<C extends CanvasHandler, S exten
                 CanvasControl.SessionAware<S> {
 
     CanvasInPlaceTextEditorControl<C, S, E> show(final E item,
+                                                 final HasTitle shape,
                                                  final double x,
                                                  final double y);
 

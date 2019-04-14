@@ -108,7 +108,12 @@ public interface HasTitle<T> {
 
     T setTitleXOffsetPosition(final Double xOffset);
 
+    Double getTitleXOffsetPosition();
+
     T setTitleYOffsetPosition(final Double yOffset);
+
+    Double getTitleYOffsetPosition();
+
 
     T setTitleRotation(final double degrees);
 

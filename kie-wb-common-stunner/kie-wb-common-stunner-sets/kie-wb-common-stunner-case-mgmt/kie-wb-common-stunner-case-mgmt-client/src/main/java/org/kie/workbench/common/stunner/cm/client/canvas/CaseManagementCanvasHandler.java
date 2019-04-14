@@ -22,6 +22,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.cm.client.shape.CaseManagementShape;
 import org.kie.workbench.common.stunner.cm.client.shape.view.CaseManagementShapeView;
@@ -78,6 +79,8 @@ public class CaseManagementCanvasHandler<D extends Diagram, C extends WiresCanva
               canvasElementRemovedEvent,
               canvasElementUpdatedEvent,
               canvasElementsClearEvent);
+
+        GWT.log(" CaseManagementCanvasHandler " + textPropertyProviderFactory.getClass().getCanonicalName());
     }
 
     @Override

@@ -18,9 +18,9 @@ package org.kie.workbench.common.stunner.core.client.canvas.controls.actions;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
@@ -29,7 +29,7 @@ import org.kie.workbench.common.stunner.core.graph.Element;
 
 @Dependent
 @MultiLineTextEditorBox
-@Default
+//@Default
 public class CanvasInPlaceTextEditorControlMultiLine
         extends AbstractCanvasInPlaceTextEditorControl {
 
@@ -39,7 +39,7 @@ public class CanvasInPlaceTextEditorControlMultiLine
 
     @Inject
     public CanvasInPlaceTextEditorControlMultiLine(final FloatingView<IsWidget> floatingView,
-                                                   final @MultiLineTextEditorBox TextEditorBox<AbstractCanvasHandler, Element> textEditorBox,
+                                                   final @SingleLineTextEditorBox TextEditorBox<AbstractCanvasHandler, Element> textEditorBox,
                                                    final Event<CanvasSelectionEvent> canvasSelectionEvent) {
         this.floatingView = floatingView;
         this.textEditorBox = textEditorBox;
@@ -48,16 +48,22 @@ public class CanvasInPlaceTextEditorControlMultiLine
 
     @Override
     protected FloatingView<IsWidget> getFloatingView() {
+        GWT.log("CanvasInPlaceTextEditorControlMultiLine getFloatingView " + floatingView.getClass().getCanonicalName());
+
         return floatingView;
     }
 
     @Override
     protected TextEditorBox<AbstractCanvasHandler, Element> getTextEditorBox() {
+        GWT.log("CanvasInPlaceTextEditorControlMultiLine getFloatingView " + textEditorBox.getClass().getCanonicalName());
+
         return textEditorBox;
     }
 
     @Override
     protected Event<CanvasSelectionEvent> getCanvasSelectionEvent() {
+        GWT.log("CanvasInPlaceTextEditorControlMultiLine getFloatingView " + canvasSelectionEvent.getClass().getCanonicalName());
+
         return canvasSelectionEvent;
     }
 }

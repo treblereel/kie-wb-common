@@ -151,12 +151,6 @@ public abstract class AbstractCanvasInPlaceTextEditorControlTest<C extends Abstr
 
     protected C control;
 
-    interface TestShapeView extends ShapeView,
-                                    HasTitle,
-                                    HasEventHandlers {
-
-    }
-
     @Before
     public void setup() {
         when(session.getKeyboardControl()).thenReturn(keyboardControl);
@@ -281,6 +275,7 @@ public abstract class AbstractCanvasInPlaceTextEditorControlTest<C extends Abstr
         textDoubleClickHandler.handle(new TextDoubleClickEvent(0, 1, X, Y));
 
         verify(control).show(eq(element),
+                             (HasTitle) shape,
                              eq(X),
                              eq(Y));
     }
@@ -327,7 +322,9 @@ public abstract class AbstractCanvasInPlaceTextEditorControlTest<C extends Abstr
 
         when(textEditorBox.isVisible()).thenReturn(true);
 
-        control.show(element, X, Y);
+        control.show(element,
+                     (HasTitle) shape,
+                     X, Y);
 
         verify(textEditorBox).flush();
         assertShow();
@@ -339,7 +336,9 @@ public abstract class AbstractCanvasInPlaceTextEditorControlTest<C extends Abstr
 
         when(textEditorBox.isVisible()).thenReturn(false);
 
-        control.show(element, X, Y);
+        control.show(element,
+                     (HasTitle) shape,
+                     X, Y);
 
         assertShow();
     }
@@ -348,7 +347,7 @@ public abstract class AbstractCanvasInPlaceTextEditorControlTest<C extends Abstr
     public void testHideWhenIsVisible() {
         control.init(canvasHandler);
 
-        control.show(element, X, Y);
+        control.show(element, (HasTitle) shape, X, Y);
 
         reset(textEditorBox, floatingView);
 
@@ -426,5 +425,11 @@ public abstract class AbstractCanvasInPlaceTextEditorControlTest<C extends Abstr
 
         verify(textEditorBox, times(t)).hide();
         verify(floatingView, times(t)).hide();
+    }
+
+    interface TestShapeView extends ShapeView,
+                                    HasTitle,
+                                    HasEventHandlers {
+
     }
 }
