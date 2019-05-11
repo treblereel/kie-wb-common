@@ -95,6 +95,12 @@ public interface HasTitle<T> {
         }
     }
 
+    String getFontSize();
+
+    String getFontFamily();
+
+    String getFontStyle();
+
     T setTextSizeConstraints(final Size sizeConstraints);
 
     T setTitlePosition(final VerticalAlignment verticalAlignment,

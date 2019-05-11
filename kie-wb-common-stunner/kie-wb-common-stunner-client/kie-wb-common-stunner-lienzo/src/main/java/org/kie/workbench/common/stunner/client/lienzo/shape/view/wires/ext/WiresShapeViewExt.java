@@ -83,17 +83,13 @@ public class WiresShapeViewExt<T extends WiresShapeViewExt>
         setListening(true);
     }
 
-    protected void setEventHandlerManager(final ViewEventHandlerManager eventHandlerManager) {
-        this.eventHandlerManager = eventHandlerManager;
-        setTextViewDecorator(new WiresTextDecorator(() -> eventHandlerManager, this));
-    }
-
     protected ViewEventHandlerManager getEventHandlerManager() {
         return this.eventHandlerManager;
     }
 
-    void setTextViewDecorator(final WiresTextDecorator textViewDecorator) {
-        this.textViewDecorator = textViewDecorator;
+    protected void setEventHandlerManager(final ViewEventHandlerManager eventHandlerManager) {
+        this.eventHandlerManager = eventHandlerManager;
+        setTextViewDecorator(new WiresTextDecorator(() -> eventHandlerManager, this));
     }
 
     @Override
@@ -128,14 +124,23 @@ public class WiresShapeViewExt<T extends WiresShapeViewExt>
     }
 
     @Override
-    public T setTextSizeConstraints(final Size sizeConstraints) {
-        textViewDecorator.setTextSizeConstraints(sizeConstraints);
-        return cast();
+    public String getFontSize() {
+        return Double.toString(textViewDecorator.getView().getFontSize());
     }
 
     @Override
-    public T setTitleXOffsetPosition(final Double xOffset) {
-        textViewDecorator.setTitleXOffsetPosition(xOffset);
+    public String getFontStyle() {
+        return textViewDecorator.getView().getFontStyle();
+    }
+
+    @Override
+    public String getFontFamily() {
+        return textViewDecorator.getView().getFontFamily();
+    }
+
+    @Override
+    public T setTextSizeConstraints(final Size sizeConstraints) {
+        textViewDecorator.setTextSizeConstraints(sizeConstraints);
         return cast();
     }
 
@@ -145,14 +150,20 @@ public class WiresShapeViewExt<T extends WiresShapeViewExt>
     }
 
     @Override
-    public T setTitleYOffsetPosition(final Double yOffset) {
-        textViewDecorator.setTitleYOffsetPosition(yOffset);
+    public T setTitleXOffsetPosition(final Double xOffset) {
+        textViewDecorator.setTitleXOffsetPosition(xOffset);
         return cast();
     }
 
     @Override
     public Double getTitleYOffsetPosition() {
         return textViewDecorator.getTitleYOffsetPosition();
+    }
+
+    @Override
+    public T setTitleYOffsetPosition(final Double yOffset) {
+        textViewDecorator.setTitleYOffsetPosition(yOffset);
+        return cast();
     }
 
     @Override
@@ -379,6 +390,10 @@ public class WiresShapeViewExt<T extends WiresShapeViewExt>
 
     protected WiresTextDecorator getTextViewDecorator() {
         return textViewDecorator;
+    }
+
+    void setTextViewDecorator(final WiresTextDecorator textViewDecorator) {
+        this.textViewDecorator = textViewDecorator;
     }
 
     protected void rebuildTextBoundaries(final double width,

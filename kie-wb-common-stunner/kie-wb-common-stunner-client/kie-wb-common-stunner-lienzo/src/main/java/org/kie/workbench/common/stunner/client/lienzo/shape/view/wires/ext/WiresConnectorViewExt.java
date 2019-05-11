@@ -139,6 +139,24 @@ public class WiresConnectorViewExt<T>
     }
 
     @Override
+    public String getFontSize() {
+        // Do not apply here...
+        return "";
+    }
+
+    @Override
+    public String getFontFamily() {
+        // Do not apply here...
+        return "";
+    }
+
+    @Override
+    public String getFontStyle() {
+        // Do not apply here...
+        return "";
+    }
+
+    @Override
     public T setTextSizeConstraints(final Size sizeConstraints) {
         // Do not apply here...
         return cast();

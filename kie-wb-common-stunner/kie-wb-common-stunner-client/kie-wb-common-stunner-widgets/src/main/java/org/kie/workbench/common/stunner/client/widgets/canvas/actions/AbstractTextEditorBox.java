@@ -159,4 +159,19 @@ public abstract class AbstractTextEditorBox implements TextEditorBoxView.Present
             onSave();
         }
     }
+
+    @Override
+    public void setFontSize(double fontSize) {
+
+    }
+
+    @Override
+    public void setFontFamily(String fontFamily) {
+
+    }
+
+    @Override
+    public void setFontStyle(String fontStyle) {
+
+    }
 }

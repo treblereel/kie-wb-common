@@ -47,6 +47,7 @@ import org.kie.workbench.common.stunner.core.client.shape.view.event.TextExitEve
 import org.kie.workbench.common.stunner.core.client.shape.view.event.TextExitHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ViewEventType;
 import org.kie.workbench.common.stunner.core.graph.Element;
+import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.uberfire.mvp.Command;
 
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
@@ -167,6 +168,7 @@ public abstract class AbstractCanvasInPlaceTextEditorControl
                                                                                               final HasTitle shape,
                                                                                               final double x,
                                                                                               final double y) {
+        Point2D scale = getCanvas().getTransform().getScale();
 
         double left = $(".canvas-panel").offset().left;
         double top = $(".canvas-panel").offset().top;
@@ -174,27 +176,6 @@ public abstract class AbstractCanvasInPlaceTextEditorControl
         GWT.log("offset " + left + " " + top);
 
         final Shape<?> shapez = getShape(item.getUUID());
-
-        GWT.log("shape " + shapez.getShapeView().getShapeX() + " " + shapez.getShapeView().getShapeY());
-
-        GWT.log("1 getCanonicalName " + item.getClass().getCanonicalName() + " " + shape.getClass().getCanonicalName());
-        GWT.log("1 X " + x + " " + shape.getTitleXOffsetPosition());
-        GWT.log("1 Y " + y + " " + shape.getTitleYOffsetPosition());
-        GWT.log("getShapeAbsoluteLocation x " + x + " " + shapez.getShapeView().getShapeAbsoluteLocation().getX());
-        GWT.log("getShapeAbsoluteLocation y " + y + " " + shapez.getShapeView().getShapeAbsoluteLocation().getY());
-        GWT.log("1 Y " + y + " " + shape.getTitleYOffsetPosition());
-
-/*        final Shape<?> alt = getShape(item.getUUID());
-
-        GWT.log("2 X " + ((HasTitle) alt).getTitleXOffsetPosition());
-        GWT.log("2 Y " + ((HasTitle) alt).getTitleYOffsetPosition());*/
-
-/*        if (getShape(item.getUUID()) instanceof HasTitle) {
-            HasTitle hasTitle = (HasTitle) getShape(item.getUUID());
-
-            GWT.log("1 X " + x);
-            GWT.log("1 Y " + y);
-        }*/
 
         if (getTextEditorBox().isVisible()) {
             flush();
@@ -205,42 +186,41 @@ public abstract class AbstractCanvasInPlaceTextEditorControl
         final double offsetX = getTextEditorBox().getDisplayOffsetX();
         final double offsetY = getTextEditorBox().getDisplayOffsetY();
 
+        GWT.log("offsetY " + offsetY);
+
+        // Y  height
+
+        // X Width
+
+        GWT.log("??? " + getTextEditorBox().getClass().getCanonicalName());
+
+        getTextEditorBox().setWidth(shapez.getShapeView().getBoundingBox().getWidth() * scale.getX());
+        getTextEditorBox().setHeight((shapez.getShapeView().getBoundingBox().getHeight() - offsetY - shape.getTitleYOffsetPosition()) * scale.getY());
+
+        GWT.log("??? " + shape.getClass().getCanonicalName());
+
+        GWT.log("getFontFamily " + shape.getFontFamily());
+        GWT.log("getFontSize " + shape.getFontSize());
+
+        getTextEditorBox().setFontFamily(shape.getFontFamily());
+
+
+        GWT.log("getFontSize and set " + 15 * scale.getX());
+
+        getTextEditorBox().setFontSize(16 * scale.getX()); //TODO
+        getTextEditorBox().setFontStyle(shape.getFontStyle());
+
+        //getCanvas().getTransform().getScale();
+        GWT.log("Scale " + getCanvas().getTransform().getScale().toString());
+
+
         getFloatingView()
-                .setX(shapez.getShapeView().getShapeX())
-                .setY(shapez.getShapeView().getShapeY())
-                .setOffsetX((left + offsetX) + shape.getTitleXOffsetPosition())
-                .setOffsetY((top + offsetY) + shape.getTitleYOffsetPosition())
+                .setX(shapez.getShapeView().getShapeX() * scale.getX())
+                .setY(shapez.getShapeView().getShapeY() * scale.getY())
+                .setOffsetX(left * scale.getX())
+                .setOffsetY(((top + offsetY) + shape.getTitleYOffsetPosition() * scale.getX()))
                 .show();
 
-        GWT.log("* x " + x + " " + shapez.getShapeView().getShapeAbsoluteLocation().getX() + " " + offsetX + " " + shape.getTitleXOffsetPosition());
-        GWT.log("* y " + y + " " + shapez.getShapeView().getShapeAbsoluteLocation().getY() + " " + shapez.getShapeView().getShapeY() + " " + offsetY + " " + shape.getTitleYOffsetPosition());
-
-
-
-
-/*        getFloatingView()
-                .setX(shapez.getShapeView().getShapeAbsoluteLocation().getX())
-                .setY(shapez.getShapeView().getShapeAbsoluteLocation().getY())
-                .setOffsetX(0)
-                .setOffsetY(-(offsetY+20))
-                .show();*/
-
-
-
-/*        if (shape instanceof HasTitle) {
-
-            getFloatingView()
-                    .setX(x)
-                    .setY(y)
-                    //.setOffsetX(-(offsetX - shape.getTitleXOffsetPosition() + 20))
-                    .setOffsetX(-(offsetX - shape.getTitleXOffsetPosition()))
-                    //.setOffsetY(-(offsetY - shape.getTitleYOffsetPosition()) - 20)
-                    .setOffsetY(-(offsetY - shape.getTitleYOffsetPosition()))
-                    .show();
-
-            GWT.log("3 X " + shape.getTitleXOffsetPosition() + " " + offsetX + " result " + (offsetX + 20));
-            GWT.log("3 Y " + shape.getTitleYOffsetPosition() + " " + offsetY + " result " + (offsetY - 20));
-        }*/
 
         return this;
     }

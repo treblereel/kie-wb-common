@@ -42,6 +42,16 @@ public class TextEditorMultiLineBox extends AbstractTextEditorBox {
     }
 
     @Override
+    public void setWidth(double width) {
+
+    }
+
+    @Override
+    public void setHeight(double height) {
+
+    }
+
+    @Override
     public double getDisplayOffsetX() {
         return OFFSET_X;
     }

@@ -362,6 +362,24 @@ public class WiresTextDecorator implements HasTitle<WiresTextDecorator> {
     }
 
     @Override
+    public String getFontSize() {
+        // Do not apply here...
+        return "";
+    }
+
+    @Override
+    public String getFontFamily() {
+        // Do not apply here...
+        return "";
+    }
+
+    @Override
+    public String getFontStyle() {
+        // Do not apply here...
+        return "";
+    }
+
+    @Override
     public WiresTextDecorator setTextSizeConstraints(final Size sizeConstraints) {
         this.sizeConstraints = Optional.ofNullable(sizeConstraints);
         return this;

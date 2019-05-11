@@ -36,6 +36,8 @@ import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull
 @Dependent
 public class FloatingWidgetView implements FloatingView<IsWidget> {
 
+    private final FlowPanel panel = new FlowPanel();
+    private final HandlerRegistrationImpl handlerRegistrationManager = new HandlerRegistrationImpl();
     private double ox;
     private double oy;
     private double x;
@@ -45,8 +47,6 @@ public class FloatingWidgetView implements FloatingView<IsWidget> {
     private int timeout = 800;
     private boolean visible;
     private Command hideCallback;
-    private final FlowPanel panel = new FlowPanel();
-    private final HandlerRegistrationImpl handlerRegistrationManager = new HandlerRegistrationImpl();
 
     public FloatingWidgetView() {
         this.attached = false;

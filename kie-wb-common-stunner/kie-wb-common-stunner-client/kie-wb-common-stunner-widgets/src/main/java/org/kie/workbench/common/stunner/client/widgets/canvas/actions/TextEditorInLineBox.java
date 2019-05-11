@@ -19,17 +19,18 @@ package org.kie.workbench.common.stunner.client.widgets.canvas.actions;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.InLineTextEditorBox;
 
 @Dependent
 @InLineTextEditorBox
 public class TextEditorInLineBox extends AbstractTextEditorBox {
 
-    private static final double OFFSET_X = -25.0;
+    private static final double OFFSET_X = -25.0; //width
 
-    private static final double OFFSET_Y = -10.0;
+    private static final double OFFSET_Y = -10.0; // height
 
-    private final TextEditorBoxView view;
+    private final TextEditorInLineBoxView view;
 
     @Inject
     public TextEditorInLineBox(final @InLineTextEditorBox
@@ -40,6 +41,33 @@ public class TextEditorInLineBox extends AbstractTextEditorBox {
     @Override
     protected TextEditorBoxView getView() {
         return view;
+    }
+
+    @Override
+    public void setWidth(double width) {
+        view.setWidth(width);
+    }
+
+    @Override
+    public void setHeight(double height) {
+        view.setHeight(height);
+    }
+
+    @Override
+    public void setFontSize(double fontSize) {
+        GWT.log("TextEditorInLineBox setFontSize " + fontSize);
+
+        view.setFontSize(fontSize);
+    }
+
+    @Override
+    public void setFontFamily(String fontFamily) {
+        view.setFontFamily(fontFamily);
+    }
+
+    @Override
+    public void setFontStyle(String fontStyle) {
+        view.setFontStyle(fontStyle);
     }
 
     @Override

@@ -82,6 +82,21 @@ public class ShapeViewExtStub
     }
 
     @Override
+    public String getFontSize() {
+        return null;
+    }
+
+    @Override
+    public String getFontFamily() {
+        return null;
+    }
+
+    @Override
+    public String getFontStyle() {
+        return null;
+    }
+
+    @Override
     public Object setTextSizeConstraints(final Size sizeConstraints) {
         return this;
     }
