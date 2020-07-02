@@ -39,11 +39,6 @@ public abstract class AbstractTranslationService implements StunnerTranslationSe
     }
 
     @Override
-    public String getPropertySetName(String propSetId) {
-        return getValue(propSetId + I18N_SEPARATOR + CAPTION_SUFFIX);
-    }
-
-    @Override
     public String getDefinitionTitle(String defId) {
         PortablePreconditions.checkNotNull("defId",
                                            defId);
@@ -70,13 +65,6 @@ public abstract class AbstractTranslationService implements StunnerTranslationSe
                 .orElseGet(() -> Optional.ofNullable(getValue(propId + I18N_SEPARATOR + LABEL_SUFFIX))
                         .orElseGet(() -> Optional.ofNullable(getDefinitionTitle(propId))
                                 .orElse(propId)));
-    }
-
-    @Override
-    public String getPropertyDescription(String propId) {
-        PortablePreconditions.checkNotNull("propId",
-                                           propId);
-        return getValue(propId + I18N_SEPARATOR + DESCRIPTION_SUFFIX);
     }
 
     protected String getRuleViolationMessage(final RuleViolation ruleViolation) {
