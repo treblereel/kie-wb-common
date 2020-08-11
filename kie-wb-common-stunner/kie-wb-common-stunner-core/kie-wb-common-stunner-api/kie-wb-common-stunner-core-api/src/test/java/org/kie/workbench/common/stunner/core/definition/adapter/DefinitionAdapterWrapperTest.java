@@ -42,8 +42,10 @@ public class DefinitionAdapterWrapperTest {
     private Object pojo;
 
     @Before
+    @SuppressWarnings("all")
     public void setUp() {
-        tested = new DefinitionAdapterWrapper(wrapped);
+        tested = new DefinitionAdapterWrapper(wrapped) {
+        };
     }
 
     @Test

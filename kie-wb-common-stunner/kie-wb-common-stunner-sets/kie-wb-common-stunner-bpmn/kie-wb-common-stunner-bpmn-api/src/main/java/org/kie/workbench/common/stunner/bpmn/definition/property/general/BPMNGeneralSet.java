@@ -50,13 +50,6 @@ public class BPMNGeneralSet implements BPMNPropertySet,
     )
     private Documentation documentation;
 
-    @Property
-    @FormField(
-            type = TextAreaFieldType.class,
-            afterElement = "documentation"
-    )
-    private String newField;
-
     public BPMNGeneralSet() {
         this(new Name(""),
              new Documentation());
@@ -77,14 +70,6 @@ public class BPMNGeneralSet implements BPMNPropertySet,
     public BPMNGeneralSet(String name) {
         this.name = new Name(name);
         this.documentation = new Documentation();
-    }
-
-    public String getNewField() {
-        return newField;
-    }
-
-    public void setNewField(String newField) {
-        this.newField = newField;
     }
 
     @Override

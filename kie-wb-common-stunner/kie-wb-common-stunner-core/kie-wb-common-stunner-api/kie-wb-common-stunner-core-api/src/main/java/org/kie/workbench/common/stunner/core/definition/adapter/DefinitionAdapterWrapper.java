@@ -21,7 +21,7 @@ import java.util.Optional;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 
-public class DefinitionAdapterWrapper<T, A extends DefinitionAdapter<T>>
+public abstract class DefinitionAdapterWrapper<T, A extends DefinitionAdapter<T>>
         implements DefinitionAdapter<T> {
 
     protected final A adapter;

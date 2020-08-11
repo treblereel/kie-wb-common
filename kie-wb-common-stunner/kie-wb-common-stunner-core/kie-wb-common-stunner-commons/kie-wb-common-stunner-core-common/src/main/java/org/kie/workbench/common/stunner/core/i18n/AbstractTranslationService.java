@@ -67,6 +67,11 @@ public abstract class AbstractTranslationService implements StunnerTranslationSe
                                 .orElse(propId)));
     }
 
+    @Override
+    public String getViolationMessage(RuleViolation ruleViolation) {
+        return getRuleViolationMessage(ruleViolation);
+    }
+
     protected String getRuleViolationMessage(final RuleViolation ruleViolation) {
         final String type = ruleViolation.getClass().getName();
         final Optional<Object[]> arguments = ruleViolation.getArguments();
