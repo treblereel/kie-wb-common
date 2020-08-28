@@ -16,9 +16,14 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.property.diagram;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.validation.Valid;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
@@ -30,6 +35,10 @@ import org.kie.workbench.common.forms.adf.definitions.annotations.field.selector
 import org.kie.workbench.common.forms.adf.definitions.settings.FieldPolicy;
 import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.selectors.listBox.type.ListBoxFieldType;
 import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.textArea.type.TextAreaFieldType;
+import org.kie.workbench.common.stunner.bpmn.definition.BPMNViewDefinition;
+import org.kie.workbench.common.stunner.bpmn.definition.ScriptTask;
+import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.MetaData;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.imports.Imports;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Documentation;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Name;
@@ -75,6 +84,7 @@ public class DiagramSet implements BaseDiagramSet {
             afterElement = "id"
     )
     @Valid
+    @XmlAttribute(name = "drools:packageName")
     private Package packageProperty;
 
     @Property
@@ -95,6 +105,7 @@ public class DiagramSet implements BaseDiagramSet {
             afterElement = "processType"
     )
     @Valid
+    @XmlAttribute(name = "drools:version")
     private Version version;
 
     @Property
@@ -102,6 +113,7 @@ public class DiagramSet implements BaseDiagramSet {
             afterElement = "version"
     )
     @Valid
+    @XmlAttribute(name = "drools:adHoc")
     private AdHoc adHoc;
 
     @Property
@@ -109,6 +121,7 @@ public class DiagramSet implements BaseDiagramSet {
             afterElement = ADHOC
     )
     @Valid
+    @XmlTransient
     private ProcessInstanceDescription processInstanceDescription;
 
     @Property
@@ -117,6 +130,7 @@ public class DiagramSet implements BaseDiagramSet {
             type = ImportsFieldType.class
     )
     @Valid
+    @XmlTransient
     private Imports imports;
 
     @Property
@@ -127,7 +141,17 @@ public class DiagramSet implements BaseDiagramSet {
 
     @Property
     @FormField(afterElement = "executable")
+    @XmlTransient
     private SLADueDate slaDueDate;
+
+    @XmlElementRefs({
+            @XmlElementRef(name = "bpmn2:userTask", type = UserTask.class),
+            @XmlElementRef(name = "bpmn2:scriptTask", type = ScriptTask.class)
+    })
+    private List<BPMNViewDefinition> definitionList;
+
+    @XmlAttribute(namespace = "bpmn2")
+    private List<MetaData> extensionElements;
 
     public DiagramSet() {
         this(new Name(),
@@ -312,5 +336,21 @@ public class DiagramSet implements BaseDiagramSet {
                     Objects.equals(slaDueDate, other.slaDueDate);
         }
         return false;
+    }
+
+    public List<BPMNViewDefinition> getDefinitionList() {
+        return definitionList;
+    }
+
+    public void setDefinitionList(List<BPMNViewDefinition> definitionList) {
+        this.definitionList = definitionList;
+    }
+
+    public List<MetaData> getExtensionElements() {
+        return extensionElements;
+    }
+
+    public void setExtensionElements(List<MetaData> extensionElements) {
+        this.extensionElements = extensionElements;
     }
 }

@@ -16,29 +16,9 @@
 
 package org.kie.workbench.common.stunner.bpmn.backend.service.diagram.marshalling.tasks;
 
-import java.util.List;
+public class UserTaskTest { //extends TaskTest<UserTask> {
 
-import org.junit.Test;
-import org.kie.workbench.common.stunner.bpmn.backend.converters.customproperties.DeclarationList;
-import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl;
-import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
-import org.kie.workbench.common.stunner.bpmn.definition.property.task.ScriptTypeValue;
-import org.kie.workbench.common.stunner.bpmn.definition.property.task.UserTaskExecutionSet;
-import org.kie.workbench.common.stunner.bpmn.definition.property.variables.ProcessData;
-import org.kie.workbench.common.stunner.bpmn.definition.property.variables.ProcessVariables;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
-import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.kie.workbench.common.stunner.core.graph.Graph;
-import org.kie.workbench.common.stunner.core.graph.Node;
-import org.kie.workbench.common.stunner.core.graph.content.view.View;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class UserTaskTest extends TaskTest<UserTask> {
-
-    private static final String BPMN_TASK_FILE_PATH = "org/kie/workbench/common/stunner/bpmn/backend/service/diagram/userTasks.bpmn";
+  /*  private static final String BPMN_TASK_FILE_PATH = "org/kie/workbench/common/stunner/bpmn/backend/service/diagram/userTasks.bpmn";
 
     private static final String EMPTY_TOP_LEVEL_TASK_ID = "B740EDEB-E4EE-472C-BEF2-E3C01A7B1949";
     private static final String FILLED_TOP_LEVEL_TASK_JAVA_ID = "7799D66F-5754-4850-AF35-D60E78105D88";
@@ -1246,5 +1226,5 @@ public class UserTaskTest extends TaskTest<UserTask> {
 
         assertEquals(content, executionSet.getContent().getValue());
         assertEquals(slaDueDate, executionSet.getSlaDueDate().getValue());
-    }
+    }*/
 }

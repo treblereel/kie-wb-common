@@ -18,6 +18,8 @@ package org.kie.workbench.common.stunner.bpmn.definition;
 import java.util.Set;
 
 import javax.validation.Valid;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
@@ -40,6 +42,8 @@ import org.kie.workbench.common.stunner.core.definition.annotation.definition.Ca
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
 import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
+import org.treblereel.gwt.jackson.api.annotation.TargetNamespace;
+import org.treblereel.gwt.jackson.api.annotation.XMLMapper;
 
 import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.SubFormFieldInitializer.COLLAPSIBLE_CONTAINER;
 import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.SubFormFieldInitializer.FIELD_CONTAINER_PARAM;
@@ -53,6 +57,9 @@ import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.pr
         policy = FieldPolicy.ONLY_MARKED,
         defaultFieldSettings = {@FieldParam(name = FIELD_CONTAINER_PARAM, value = COLLAPSIBLE_CONTAINER)}
 )
+@XMLMapper
+@XmlRootElement(name = "bpmn2:definitions")
+@TargetNamespace(prefix = "bpmn2", namespace = "http://www.omg.org/bpmn20")
 public class BPMNDiagramImpl implements BPMNDiagram<DiagramSet, ProcessData, AdvancedData> {
 
     @Category
@@ -65,6 +72,7 @@ public class BPMNDiagramImpl implements BPMNDiagram<DiagramSet, ProcessData, Adv
     @PropertySet
     @FormField
     @Valid
+    @XmlTransient
     private DiagramSet diagramSet;
 
     @PropertySet

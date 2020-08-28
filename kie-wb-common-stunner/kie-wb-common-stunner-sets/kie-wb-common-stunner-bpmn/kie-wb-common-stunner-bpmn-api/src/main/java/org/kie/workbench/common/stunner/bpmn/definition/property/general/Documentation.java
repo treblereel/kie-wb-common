@@ -16,6 +16,9 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.property.general;
 
+import javax.xml.bind.annotation.XmlCData;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.forms.adf.definitions.annotations.metaModel.FieldDefinition;
@@ -29,10 +32,12 @@ import org.kie.workbench.common.stunner.core.definition.annotation.property.Valu
 @Bindable
 @Property
 @FieldDefinition(i18nMode = I18nMode.OVERRIDE_I18N_KEY)
+@XmlRootElement(name = "documentation", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 public class Documentation implements BPMNProperty {
 
     @Value
     @FieldValue
+    @XmlCData
     private String value;
 
     public Documentation() {

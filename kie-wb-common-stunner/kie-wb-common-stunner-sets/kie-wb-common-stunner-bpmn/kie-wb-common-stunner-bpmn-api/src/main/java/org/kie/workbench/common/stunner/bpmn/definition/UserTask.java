@@ -42,8 +42,8 @@ import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.rule.annotation.CanDock;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
 
-import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.SubFormFieldInitializer.COLLAPSIBLE_CONTAINER;
-import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.SubFormFieldInitializer.FIELD_CONTAINER_PARAM;
+import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.AbstractEmbeddedFormsInitializer.COLLAPSIBLE_CONTAINER;
+import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.AbstractEmbeddedFormsInitializer.FIELD_CONTAINER_PARAM;
 
 @Portable
 @Bindable
@@ -66,13 +66,13 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
 
     public UserTask() {
         this(new TaskGeneralSet(new Name("Task"),
-                                new Documentation("")),
-             new UserTaskExecutionSet(),
-             new BackgroundSet(),
-             new FontSet(),
-             new RectangleDimensionsSet(),
-             new SimulationSet(),
-             new TaskType(TaskTypes.USER));
+                        new Documentation("")),
+                new UserTaskExecutionSet(),
+                new BackgroundSet(),
+                new FontSet(),
+                new RectangleDimensionsSet(),
+                new SimulationSet(),
+                new TaskType(TaskTypes.USER));
     }
 
     public UserTask(final @MapsTo("general") TaskGeneralSet general,
@@ -83,11 +83,11 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
                     final @MapsTo("simulationSet") SimulationSet simulationSet,
                     final @MapsTo("taskType") TaskType taskType) {
         super(general,
-              backgroundSet,
-              fontSet,
-              dimensionsSet,
-              simulationSet,
-              taskType);
+                backgroundSet,
+                fontSet,
+                dimensionsSet,
+                simulationSet,
+                taskType);
         this.executionSet = executionSet;
     }
 
@@ -104,7 +104,7 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
     @Override
     public int hashCode() {
         return HashUtil.combineHashCodes(super.hashCode(),
-                                         executionSet.hashCode());
+                executionSet.hashCode());
     }
 
     @Override

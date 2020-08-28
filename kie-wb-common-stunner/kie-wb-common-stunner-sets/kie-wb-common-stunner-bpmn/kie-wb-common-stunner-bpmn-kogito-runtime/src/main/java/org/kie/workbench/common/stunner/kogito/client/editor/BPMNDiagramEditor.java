@@ -17,6 +17,7 @@ package org.kie.workbench.common.stunner.kogito.client.editor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -25,11 +26,20 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.xml.stream.XMLStreamException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import elemental2.promise.Promise;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.kogito.client.editor.MultiPageEditorContainerView;
+import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl;
+import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl_MapperImpl;
+import org.kie.workbench.common.stunner.bpmn.definition.BPMNViewDefinition;
+import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions_MapperImpl;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.JSON;
 import org.kie.workbench.common.stunner.client.widgets.presenters.Viewer;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
@@ -49,6 +59,7 @@ import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.client.validation.canvas.CanvasDiagramValidator;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.DiagramImpl;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.documentation.DocumentationView;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
@@ -275,7 +286,96 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
     public Promise getContent() {
         flush();
         validateDiagram(getCanvasHandler());
+
+        GWT.log("getContent 1 " + getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get().getClass().getCanonicalName());
+        GWT.log("getContent 2 " + getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get().getGraph().getContent().getClass().getCanonicalName());
+
+
+        //KogitoDiagramResourceImpl impl = getEditor().getEditorProxy().getContentSupplier().get();
+
+
+
+        DiagramImpl diagram = convert(getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get());
+
+        Definitions definitions = new Definitions();
+        List<BPMNViewDefinition> definitionList = new LinkedList<>();
+
+        diagram.getGraph().nodes().forEach(n -> {
+            org.kie.workbench.common.stunner.core.graph.impl.NodeImpl elm = (org.kie.workbench.common.stunner.core.graph.impl.NodeImpl) n;
+            GWT.log("n 1 " + elm + " " + elm.asNode().getClass().getCanonicalName());
+            GWT.log("n 2 " + elm + " " + elm.asNode().getContent().getClass().getCanonicalName());
+            BPMNDiagramImpl bpmnDiagram;
+            if(elm.asNode().getContent() instanceof  org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl) {
+
+                org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl impl = (org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl) elm.asNode().getContent();
+
+                GWT.log("impl " + impl.getDefinition() + " " + impl.getDefinition().getClass().getCanonicalName());
+
+
+                if(impl.getDefinition() instanceof UserTask) {
+                    UserTask userTask = (UserTask) impl.getDefinition();
+                    GWT.log("            UserTask " + userTask);
+
+                    GWT.log("JSON \n " + JSON.stringify(userTask));
+
+                    definitionList.add(userTask);
+
+                } else if(impl.getDefinition() instanceof BPMNDiagramImpl) {
+                    bpmnDiagram = (BPMNDiagramImpl) impl.getDefinition();
+                    definitions.setProcess(bpmnDiagram.getDiagramSet());
+                    definitions.getProcess().setDefinitionList(definitionList);
+                    definitions.setBpmnDiagram(bpmnDiagram);
+
+                    bpmnDiagram.getDimensionsSet();
+                    bpmnDiagram.getAdvancedData();
+                    bpmnDiagram.getBackgroundSet();
+
+                    bpmnDiagram.getAdvancedData().getMetaDataAttributes().getValue();
+
+                    try {
+                        GWT.log("XML 2 \n"+ BPMNDiagramImpl_MapperImpl.INSTANCE.write(bpmnDiagram));
+                    } catch (XMLStreamException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+
+        });
+
+
+        //TODO
+        //BPMNDiagramImpl bpmnDiagram = new BPMNDiagramImpl();
+        //bpmnDiagram
+
+        try {
+            GWT.log("XML 1 \n"+Definitions_MapperImpl.INSTANCE.write(definitions));
+            //GWT.log("XML 2 \n"+ BPMNDiagramImpl_MapperImpl.INSTANCE.write(bpmnDiagram));
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        GWT.log("? "+diagram.getGraph().getContent());
+
+/*        org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet set = (org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet) diagram.getGraph().getContent();
+
+        GWT.log("SET " + set + " " + set.getClass().getCanonicalName());*/
+
+
+        //diagram.get
+
+        //getEditor().getEditorProxy().getContentSupplier().get()
+
+        //GWT.log("getContent 3 " + getEditor().getEditorProxy().getContentSupplier().get().xmlDiagram().get());
+
         return diagramServices.transform(getEditor().getEditorProxy().getContentSupplier().get());
+    }
+
+    private DiagramImpl convert(final Diagram diagram) {
+        return new DiagramImpl(diagram.getName(),
+                diagram.getGraph(),
+                diagram.getMetadata());
     }
 
     private void validateDiagram(CanvasHandler canvasHandler) {
