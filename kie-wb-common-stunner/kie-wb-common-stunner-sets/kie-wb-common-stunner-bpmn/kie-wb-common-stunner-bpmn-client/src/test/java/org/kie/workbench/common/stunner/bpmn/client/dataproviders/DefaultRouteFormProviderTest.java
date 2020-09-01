@@ -89,8 +89,8 @@ public class DefaultRouteFormProviderTest
 
         outEdges = new ArrayList<>();
 
-        UserTask userTask1 = new UserTask(new TaskGeneralSet(new Name("UserTask1"),
-                                                             null),
+        UserTask userTask1 = new UserTask(new Name("UserTask1"),
+                                                             null,
                                           null,
                                           null,
                                           null,
@@ -101,8 +101,8 @@ public class DefaultRouteFormProviderTest
         outEdges.add(mockEdge("Edge1",
                               userTask1));
 
-        UserTask userTask2 = new UserTask(new TaskGeneralSet(new Name("UserTask2"),
-                                                             null),
+        UserTask userTask2 = new UserTask(new Name("UserTask2"),
+                                                             null,
                                           null,
                                           null,
                                           null,

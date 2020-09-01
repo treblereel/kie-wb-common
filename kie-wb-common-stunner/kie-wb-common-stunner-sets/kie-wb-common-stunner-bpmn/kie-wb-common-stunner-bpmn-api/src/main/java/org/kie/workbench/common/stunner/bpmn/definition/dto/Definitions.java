@@ -24,12 +24,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagram;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.MetaData;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.DiagramSet;
 import org.treblereel.gwt.jackson.api.annotation.TargetNamespace;
 import org.treblereel.gwt.jackson.api.annotation.XMLMapper;
 
 @XMLMapper
-@XmlRootElement(name = "bpmn2:definitions")
+@XmlRootElement(name = "definitions", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 @TargetNamespace(prefix = "bpmn2", namespace = "http://www.omg.org/bpmn20")
 public class Definitions {
 
@@ -39,7 +40,7 @@ public class Definitions {
     @XmlAttribute
     private String name;
 
-    @XmlAttribute(name = "bpmn2:process")
+    //@XmlAttribute(name = "process")
     private DiagramSet process;
 
 /*
@@ -94,7 +95,8 @@ public class Definitions {
     public void setBpmnDiagram(BPMNDiagram bpmnDiagram) {
         this.bpmnDiagram = bpmnDiagram;
 
-        List<MetaData> extensionElements = new ArrayList<>();
+        //process.getExtensionElements()
+        List<MetaData>  extensionElements = new ArrayList<>();
         extensionElements.add(new MetaData("customDescription",
                 bpmnDiagram.getAdvancedData().getMetaDataAttributes().getValue()));
         process.setExtensionElements(extensionElements);

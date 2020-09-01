@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.validation.Valid;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.kie.soup.commons.util.Maps;
@@ -65,23 +66,29 @@ public abstract class BaseTask implements BPMNViewDefinition {
     @PropertySet
     @FormField
     @Valid
+    @XmlTransient
     protected TaskGeneralSet general;
 
     @Property
     @MorphProperty(binder = TaskTypeMorphPropertyBinding.class)
+    @XmlTransient
     protected TaskType taskType;
 
     @PropertySet
     @Valid
+    @XmlTransient
     protected BackgroundSet backgroundSet;
 
     @PropertySet
+    @XmlTransient
     protected FontSet fontSet;
 
     @PropertySet
+    @XmlTransient
     protected SimulationSet simulationSet;
 
     @PropertySet
+    @XmlTransient
     protected RectangleDimensionsSet dimensionsSet;
 
     public static class TaskTypeMorphPropertyBinding implements MorphPropertyValueBinding<TaskType, TaskTypes> {

@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto;
+package org.kie.workbench.common.stunner.bpmn.definition.dto.drools;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlCData;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(namespace = "drools", name = "metaData")
+@XmlRootElement(name = "metaData", namespace = "http://www.jboss.org/drools")
 public class MetaData {
 
     @XmlAttribute
     private String name;
 
     @XmlCData
+    @XmlElement(name = "drools:metaValue")
     private String metaValue;
 
     public MetaData() {

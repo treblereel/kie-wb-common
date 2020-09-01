@@ -356,8 +356,8 @@ public class ClientBPMNDocumentationServiceTest {
                 advancedData
         );
 
-        userTask = new UserTask(new TaskGeneralSet(new Name(TASK_NAME),
-                                                   new Documentation(TASK_DOC)),
+        userTask = new UserTask(new Name(TASK_NAME),
+                                                   new Documentation(TASK_DOC),
                                 new UserTaskExecutionSet(new TaskName(TASK_NAME),
                                                          new Actors(),
                                                          new Groupid(TASK_GROUPID),

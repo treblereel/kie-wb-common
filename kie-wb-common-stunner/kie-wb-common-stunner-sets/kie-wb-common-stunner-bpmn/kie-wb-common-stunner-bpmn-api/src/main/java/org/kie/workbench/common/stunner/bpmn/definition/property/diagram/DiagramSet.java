@@ -23,6 +23,8 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.jboss.errai.common.client.api.annotations.MapsTo;
@@ -36,9 +38,8 @@ import org.kie.workbench.common.forms.adf.definitions.settings.FieldPolicy;
 import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.selectors.listBox.type.ListBoxFieldType;
 import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.textArea.type.TextAreaFieldType;
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNViewDefinition;
-import org.kie.workbench.common.stunner.bpmn.definition.ScriptTask;
 import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
-import org.kie.workbench.common.stunner.bpmn.definition.dto.MetaData;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.MetaData;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.imports.Imports;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Documentation;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Name;
@@ -55,6 +56,7 @@ import org.kie.workbench.common.stunner.core.util.HashUtil;
         policy = FieldPolicy.ONLY_MARKED,
         startElement = "name"
 )
+@XmlRootElement(name = "process", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 public class DiagramSet implements BaseDiagramSet {
 
     public static final String ADHOC = "adHoc";
@@ -145,12 +147,15 @@ public class DiagramSet implements BaseDiagramSet {
     private SLADueDate slaDueDate;
 
     @XmlElementRefs({
-            @XmlElementRef(name = "bpmn2:userTask", type = UserTask.class),
-            @XmlElementRef(name = "bpmn2:scriptTask", type = ScriptTask.class)
+            @XmlElementRef(name = "userTask", type = UserTask.class),
+            //@XmlElementRef(name = "bpmn2:scriptTask", type = ScriptTask.class)
     })
     private List<BPMNViewDefinition> definitionList;
 
-    @XmlAttribute(namespace = "bpmn2")
+    //@XmlAttribute(namespace = "bpmn2")
+    @XmlElementWrapper(
+            name = "extensionElements",
+            namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
     private List<MetaData> extensionElements;
 
     public DiagramSet() {

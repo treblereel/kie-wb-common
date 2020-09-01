@@ -18,22 +18,27 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto.handler;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.kie.workbench.common.stunner.bpmn.definition.property.general.Documentation;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.DataInputAssociation;
 import org.treblereel.gwt.jackson.api.XMLSerializationContext;
 import org.treblereel.gwt.jackson.api.XMLSerializerParameters;
 import org.treblereel.gwt.jackson.api.custom.CustomXMLSerializer;
 import org.treblereel.gwt.jackson.api.stream.XMLWriter;
 
-public class DocumentationMarshaller extends CustomXMLSerializer<Documentation> {
+public class AssignmentMarshaller extends CustomXMLSerializer<DataInputAssociation.Assignment> {
 
     @Override
     protected void doSerialize(
-            XMLWriter writer, Documentation value, XMLSerializationContext ctx, XMLSerializerParameters params)
+            XMLWriter writer, DataInputAssociation.Assignment value, XMLSerializationContext ctx, XMLSerializerParameters params)
             throws XMLStreamException {
-        if (value.getValue() != null) {
-            writer.beginObject("bpmn2:documentation");
-            writer.writeCData(value.getValue());
-            writer.endObject();
-        }
+        writer.beginObject("bpmn2:assignment");
+        writer.beginObject("bpmn2:from");
+        writer.writeAttribute("xsi:type", "bpmn2:tFormalExpression");
+        writer.writeCData(value.getFrom());
+        writer.endObject();
+        writer.beginObject("bpmn2:to");
+        writer.writeAttribute("xsi:type", "bpmn2:tFormalExpression");
+        writer.writeCData(value.getTo());
+        writer.endObject();
+        writer.endObject();
     }
 }

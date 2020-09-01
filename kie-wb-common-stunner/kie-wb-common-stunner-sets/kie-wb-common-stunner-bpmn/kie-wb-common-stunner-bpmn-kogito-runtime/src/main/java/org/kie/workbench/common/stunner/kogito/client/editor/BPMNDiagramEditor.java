@@ -39,7 +39,6 @@ import org.kie.workbench.common.stunner.bpmn.definition.BPMNViewDefinition;
 import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions_MapperImpl;
-import org.kie.workbench.common.stunner.bpmn.definition.dto.JSON;
 import org.kie.workbench.common.stunner.client.widgets.presenters.Viewer;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
@@ -74,6 +73,10 @@ import org.kie.workbench.common.stunner.kogito.client.menus.BPMNStandaloneEditor
 import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.stunner.kogito.client.service.AbstractKogitoClientDiagramService;
 import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
+import org.treblereel.gwt.jackson.api.DefaultXMLDeserializationContext;
+import org.treblereel.gwt.jackson.api.DefaultXMLSerializationContext;
+import org.treblereel.gwt.jackson.api.XMLDeserializationContext;
+import org.treblereel.gwt.jackson.api.XMLSerializationContext;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.annotations.WorkbenchClientEditor;
@@ -316,7 +319,11 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
                     UserTask userTask = (UserTask) impl.getDefinition();
                     GWT.log("            UserTask " + userTask);
 
-                    GWT.log("JSON \n " + JSON.stringify(userTask));
+
+
+                    userTask.getExtensionElements();
+
+                    //GWT.log("JSON \n " + JSON.stringify(userTask));
 
                     definitionList.add(userTask);
 
@@ -349,8 +356,14 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         //BPMNDiagramImpl bpmnDiagram = new BPMNDiagramImpl();
         //bpmnDiagram
 
+        XMLSerializationContext serializationContext =
+                DefaultXMLSerializationContext.builder().wrapCollections(false).build();
+
+        XMLDeserializationContext deserializationContext =
+                DefaultXMLDeserializationContext.builder().wrapCollections(false).build();
+
         try {
-            GWT.log("XML 1 \n"+Definitions_MapperImpl.INSTANCE.write(definitions));
+            GWT.log("XML 1 \n"+Definitions_MapperImpl.INSTANCE.write(definitions, serializationContext));
             //GWT.log("XML 2 \n"+ BPMNDiagramImpl_MapperImpl.INSTANCE.write(bpmnDiagram));
         } catch (XMLStreamException e) {
             e.printStackTrace();
