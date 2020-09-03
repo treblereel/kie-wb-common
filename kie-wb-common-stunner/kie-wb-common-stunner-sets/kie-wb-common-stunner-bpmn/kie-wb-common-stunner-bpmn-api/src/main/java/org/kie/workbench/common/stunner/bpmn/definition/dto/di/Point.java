@@ -14,24 +14,35 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto;
+package org.kie.workbench.common.stunner.bpmn.definition.dto.di;
 
-import java.util.List;
+public class Point {
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+    private int x;
+    private int y;
 
-@XmlRootElement(name = "inputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class InputSet implements Data {
+    public Point() {
 
-    @XmlElement(name = "bpmn2:dataInputRefs")
-    private List<String> set;
-
-    public List<String> getSet() {
-        return set;
     }
 
-    public void setSet(List<String> set) {
-        this.set = set;
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 }

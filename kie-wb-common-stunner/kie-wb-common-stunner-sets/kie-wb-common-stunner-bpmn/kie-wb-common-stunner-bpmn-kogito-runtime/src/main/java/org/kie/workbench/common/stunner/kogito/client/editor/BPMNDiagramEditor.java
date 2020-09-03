@@ -30,15 +30,23 @@ import javax.xml.stream.XMLStreamException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
+import jsinterop.annotations.JsFunction;
+import jsinterop.base.Js;
+import org.jboss.errai.ioc.client.api.AfterInitialization;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.kogito.client.editor.MultiPageEditorContainerView;
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl;
-import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl_MapperImpl;
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNViewDefinition;
 import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions_MapperImpl;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi.BPMNPlane;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi.BPMNPlaneElement;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi.BPMNShape;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.converter.from.UserTaskConverter;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.dc.Bounds;
 import org.kie.workbench.common.stunner.client.widgets.presenters.Viewer;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
@@ -61,6 +69,10 @@ import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramImpl;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.documentation.DocumentationView;
+import org.kie.workbench.common.stunner.core.graph.Edge;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl;
+import org.kie.workbench.common.stunner.core.graph.impl.NodeImpl;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.validation.DiagramElementViolation;
 import org.kie.workbench.common.stunner.core.validation.DomainViolation;
@@ -74,9 +86,6 @@ import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPers
 import org.kie.workbench.common.stunner.kogito.client.service.AbstractKogitoClientDiagramService;
 import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
 import org.treblereel.gwt.jackson.api.DefaultXMLDeserializationContext;
-import org.treblereel.gwt.jackson.api.DefaultXMLSerializationContext;
-import org.treblereel.gwt.jackson.api.XMLDeserializationContext;
-import org.treblereel.gwt.jackson.api.XMLSerializationContext;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.annotations.WorkbenchClientEditor;
@@ -109,13 +118,12 @@ import org.uberfire.workbench.model.menu.Menus;
 public class BPMNDiagramEditor extends AbstractDiagramEditor {
 
     public static final String EDITOR_ID = "BPMNDiagramEditor";
-
+    protected final AbstractKogitoClientDiagramService diagramServices;
+    protected final FormsFlushManager formsFlushManager;
     private final DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
     private final DiagramEditorPropertiesDock diagramPropertiesDock;
     private final LayoutHelper layoutHelper;
     private final OpenDiagramLayoutExecutor openDiagramLayoutExecutor;
-    protected final AbstractKogitoClientDiagramService diagramServices;
-    protected final FormsFlushManager formsFlushManager;
     private final CanvasFileExport canvasFileExport;
     private final Promises promises;
     private final CanvasDiagramValidator<AbstractCanvasHandler> validator;
@@ -148,20 +156,20 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
                              final Promises promises,
                              final CanvasDiagramValidator<AbstractCanvasHandler> validator) {
         super(view,
-              fileMenuBuilder,
-              placeManager,
-              multiPageEditorContainerView,
-              changeTitleNotificationEvent,
-              notificationEvent,
-              onDiagramFocusEvent,
-              xmlEditorView,
-              editorSessionPresenterInstances,
-              viewerSessionPresenterInstances,
-              menuSessionItems,
-              errorPopupPresenter,
-              diagramClientErrorHandler,
-              translationService,
-              documentationView);
+                fileMenuBuilder,
+                placeManager,
+                multiPageEditorContainerView,
+                changeTitleNotificationEvent,
+                notificationEvent,
+                onDiagramFocusEvent,
+                xmlEditorView,
+                editorSessionPresenterInstances,
+                viewerSessionPresenterInstances,
+                menuSessionItems,
+                errorPopupPresenter,
+                diagramClientErrorHandler,
+                translationService,
+                documentationView);
         this.diagramPreviewAndExplorerDock = diagramPreviewAndExplorerDock;
         this.diagramPropertiesDock = diagramPropertiesDock;
         this.layoutHelper = layoutHelper;
@@ -173,122 +181,16 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         this.validator = validator;
     }
 
-    @OnStartup
-    @SuppressWarnings("unused")
-    public void onStartup(final PlaceRequest place) {
-        superDoStartUp(place);
-        initDocks();
-        getWidget().init(this);
+    @AfterInitialization
+    public void initMarshalling() {
+        Js.asPropertyMap(DomGlobal.window).set("serialize", (Serialize) () -> getXML());
+        Js.asPropertyMap(DomGlobal.window).set("deserialize", (Deserialize) xml -> setXML(xml));
     }
 
-    void superDoStartUp(final PlaceRequest place) {
-        super.doStartUp(place);
-    }
-
-    @Override
-    public void open(final Diagram diagram,
-                     final Viewer.Callback callback) {
-        this.layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
-        super.open(diagram, callback);
-    }
-
-    @OnOpen
-    @SuppressWarnings("unused")
-    public void onOpen() {
-        super.doOpen();
-    }
-
-    @OnClose
-    @SuppressWarnings("unused")
-    public void onClose() {
-        superOnClose();
-        closeDocks();
-    }
-
-    void superOnClose() {
-        super.doClose();
-    }
-
-    @Override
-    public void onDiagramLoad() {
-        final Optional<CanvasHandler> canvasHandler = Optional.ofNullable(getCanvasHandler());
-
-        canvasHandler.ifPresent(c -> {
-            final Metadata metadata = c.getDiagram().getMetadata();
-            metadata.setPath(makeMetadataPath(metadata.getRoot(), metadata.getTitle()));
-            openDocks();
-        });
-    }
-
-    private Path makeMetadataPath(final Path root,
-                                  final String title) {
-        final String uri = root.toURI();
-        return PathFactory.newPath(title, uri + "/" + title + ".bpmn");
-    }
-
-    @OnFocus
-    @SuppressWarnings("unused")
-    public void onFocus() {
-        superDoFocus();
-        onDiagramLoad();
-    }
-
-    void superDoFocus() {
-        super.doFocus();
-    }
-
-    @OnLostFocus
-    @SuppressWarnings("unused")
-    public void onLostFocus() {
-        super.doLostFocus();
-    }
-
-    @Override
-    @WorkbenchPartTitleDecoration
-    public IsWidget getTitle() {
-        return super.getTitle();
-    }
-
-    @WorkbenchPartTitle
-    public String getTitleText() {
-        return "";
-    }
-
-    @WorkbenchMenu
-    public void getMenus(final Consumer<Menus> menusConsumer) {
-        menusConsumer.accept(super.getMenus());
-    }
-
-    @Override
-    protected void makeMenuBar() {
-        if (!menuBarInitialized) {
-            getMenuSessionItems().populateMenu(getFileMenuBuilder());
-            makeAdditionalStunnerMenus(getFileMenuBuilder());
-            menuBarInitialized = true;
-        }
-    }
-
-    @Override
-    @WorkbenchPartView
-    public IsWidget asWidget() {
-        return super.asWidget();
-    }
-
-    @OnMayClose
-    public boolean onMayClose() {
-        return super.mayClose();
-    }
-
-    @Override
-    public String getEditorIdentifier() {
-        return EDITOR_ID;
-    }
-
-    @GetContent
-    @Override
-    public Promise getContent() {
+    private String getXML() {
         flush();
         validateDiagram(getCanvasHandler());
+
 
         GWT.log("getContent 1 " + getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get().getClass().getCanonicalName());
         GWT.log("getContent 2 " + getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get().getGraph().getContent().getClass().getCanonicalName());
@@ -297,92 +199,152 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         //KogitoDiagramResourceImpl impl = getEditor().getEditorProxy().getContentSupplier().get();
 
 
-
         DiagramImpl diagram = convert(getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get());
 
         Definitions definitions = new Definitions();
         List<BPMNViewDefinition> definitionList = new LinkedList<>();
+        definitions.setItemDefinitions(new LinkedList<>());
+
+        GWT.log("1 " + diagram.getMetadata().getDefinitionSetId());
+        GWT.log("2 " + diagram.getMetadata().getPath().getFileName());
+        GWT.log("3 " + diagram.getMetadata().getPath().toURI());
+        GWT.log("4 " + diagram.getMetadata().getTitle());
+        GWT.log("5 " + diagram.getMetadata().getCanvasRootUUID());
+        GWT.log("6 " + diagram.getMetadata().getShapeSetId());
+        GWT.log("7 " + diagram.getMetadata().getProfileId());
+        GWT.log("8 " + diagram.getMetadata().getRoot());
+
+
+        GWT.log("**********************************************************************");
+
+
+        GWT.log(" getContent + " + diagram.getGraph().getContent() + " " + diagram.getGraph().getContent().getClass().getCanonicalName());
+
+        //org.kie.workbench.common.stunner.core.graph.content.definition.DefinitionSetImpl definitionSetImpl = (org.kie.workbench.common.stunner.core.graph.content.definition.DefinitionSetImpl) diagram.getGraph().getContent();
+
+        BPMNPlane plane = new BPMNPlane();
+        plane.setBpmnElement(diagram.getMetadata().getTitle());
+        List<BPMNPlaneElement> elements = new ArrayList<>();
+        plane.setElements(elements);
+
+        diagram.getGraph().nodes().forEach(n -> {
+            NodeImpl elm = (NodeImpl) n;
+
+            GWT.log("  elm " + " " + elm.getContent() + " " + elm.getContent().getClass().getCanonicalName());
+
+            //ViewImpl view = (ViewImpl) elm.getContent();
+
+            Edge edge = elm.asEdge();
+            Node node = elm.asNode();
+
+            GWT.log("Edge " + edge);
+            GWT.log("Node " + node);
+
+            if (elm.asNode().getContent() instanceof ViewImpl) {
+                ViewImpl view = (ViewImpl) elm.asNode().getContent();
+                //Bounds bounds = view1.getBounds();
+                if (view.getDefinition() instanceof UserTask) {
+                    UserTask userTask = (UserTask) view.getDefinition();
+                    //GWT.log("            UserTask " + userTask + " " + bounds);
+                    UserTaskConverter.convert(userTask, definitions);
+                    BPMNShape shape = new BPMNShape(userTask.getId());
+                    shape.setBounds(new Bounds(view.getBounds()));
+                    elements.add(shape);
+                }
+            }
+        });
+
+
+        GWT.log("**********************************************************************");
 
         diagram.getGraph().nodes().forEach(n -> {
             org.kie.workbench.common.stunner.core.graph.impl.NodeImpl elm = (org.kie.workbench.common.stunner.core.graph.impl.NodeImpl) n;
             GWT.log("n 1 " + elm + " " + elm.asNode().getClass().getCanonicalName());
             GWT.log("n 2 " + elm + " " + elm.asNode().getContent().getClass().getCanonicalName());
             BPMNDiagramImpl bpmnDiagram;
-            if(elm.asNode().getContent() instanceof  org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl) {
+            if (elm.asNode().getContent() instanceof org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl) {
 
                 org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl impl = (org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl) elm.asNode().getContent();
 
                 GWT.log("impl " + impl.getDefinition() + " " + impl.getDefinition().getClass().getCanonicalName());
 
 
-                if(impl.getDefinition() instanceof UserTask) {
+                if (impl.getDefinition() instanceof UserTask) {
                     UserTask userTask = (UserTask) impl.getDefinition();
                     GWT.log("            UserTask " + userTask);
 
+                    userTask.getBpmnProperties().forEach(bpmn -> {
+                        GWT.log("BPMN " + bpmn.toString());
+                    });
+
+                    GWT.log("getAssignmentsinfo " + userTask.getExecutionSet().getAssignmentsinfo());
+
+                    GWT.log("getIsMultipleInstance " + userTask.getExecutionSet().getAssignmentsinfo());
+                    GWT.log("getIsMultipleInstance " + userTask.getExecutionSet().getMultipleInstanceCollectionInput().getValue());
+                    GWT.log("getReassignmentsInfo " + userTask.getExecutionSet().getReassignmentsInfo().getValue());
 
 
-                    userTask.getExtensionElements();
+                    //userTask.getExtensionElements();
 
                     //GWT.log("JSON \n " + JSON.stringify(userTask));
 
                     definitionList.add(userTask);
 
-                } else if(impl.getDefinition() instanceof BPMNDiagramImpl) {
+                } else if (impl.getDefinition() instanceof BPMNDiagramImpl) {
                     bpmnDiagram = (BPMNDiagramImpl) impl.getDefinition();
                     definitions.setProcess(bpmnDiagram.getDiagramSet());
                     definitions.getProcess().setDefinitionList(definitionList);
                     definitions.setBpmnDiagram(bpmnDiagram);
+                    bpmnDiagram.setPlane(plane);
+                    bpmnDiagram.getDiagramSet().getImports();
 
                     bpmnDiagram.getDimensionsSet();
                     bpmnDiagram.getAdvancedData();
                     bpmnDiagram.getBackgroundSet();
 
-                    bpmnDiagram.getAdvancedData().getMetaDataAttributes().getValue();
+                   GWT.log("getProcessData " + bpmnDiagram.getProcessData().getProcessVariables().getValue());
 
-                    try {
-                        GWT.log("XML 2 \n"+ BPMNDiagramImpl_MapperImpl.INSTANCE.write(bpmnDiagram));
-                    } catch (XMLStreamException e) {
-                        e.printStackTrace();
-                    }
 
                 }
 
             }
 
+            if (elm.asNode() instanceof org.kie.workbench.common.stunner.core.graph.impl.NodeImpl) {
+                org.kie.workbench.common.stunner.core.graph.impl.NodeImpl node = (org.kie.workbench.common.stunner.core.graph.impl.NodeImpl) elm.asNode();
+
+
+                GWT.log("\n " + node + " " + node.asNode() + " " + node.asEdge());
+
+            }
         });
 
-
-        //TODO
-        //BPMNDiagramImpl bpmnDiagram = new BPMNDiagramImpl();
-        //bpmnDiagram
-
-        XMLSerializationContext serializationContext =
-                DefaultXMLSerializationContext.builder().wrapCollections(false).build();
-
-        XMLDeserializationContext deserializationContext =
-                DefaultXMLDeserializationContext.builder().wrapCollections(false).build();
-
-        try {
-            GWT.log("XML 1 \n"+Definitions_MapperImpl.INSTANCE.write(definitions, serializationContext));
-            //GWT.log("XML 2 \n"+ BPMNDiagramImpl_MapperImpl.INSTANCE.write(bpmnDiagram));
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
+        for (BPMNViewDefinition bpmnViewDefinition : definitions.getProcess().getDefinitionList()) {
+            if (bpmnViewDefinition instanceof UserTask) {
+/*                ((UserTask) bpmnViewDefinition).getIoSpecification()
+                        .stream()
+                        .filter(elm -> elm instanceof DataInput)
+                        .map(elm -> (DataInput) elm)
+                        .forEach(elm -> definitions.getItemDefinitions().add(new ItemDefinition(elm.getItemSubjectRef())));*/
+            }
         }
 
-        GWT.log("? "+diagram.getGraph().getContent());
 
-/*        org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet set = (org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet) diagram.getGraph().getContent();
+        try {
+            return Definitions_MapperImpl.INSTANCE.write(definitions);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 
-        GWT.log("SET " + set + " " + set.getClass().getCanonicalName());*/
-
-
-        //diagram.get
-
-        //getEditor().getEditorProxy().getContentSupplier().get()
-
-        //GWT.log("getContent 3 " + getEditor().getEditorProxy().getContentSupplier().get().xmlDiagram().get());
-
-        return diagramServices.transform(getEditor().getEditorProxy().getContentSupplier().get());
+    private void setXML(String xml) {
+        GWT.log("setXML " + xml);
+        try {
+            GWT.log(Definitions_MapperImpl.INSTANCE.read(xml, DefaultXMLDeserializationContext.builder().failOnUnknownProperties(false).build()).toString());
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+            GWT.log(e.getMessage());
+        }
     }
 
     private DiagramImpl convert(final Diagram diagram) {
@@ -409,14 +371,95 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         getSessionPresenter().displayNotifications(t -> true);
     }
 
-    @GetPreview
-    public Promise getPreview() {
-        CanvasHandler canvasHandler = getCanvasHandler();
-        if (canvasHandler != null) {
-            return Promise.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
-        } else {
-            return Promise.resolve("");
+    void flush() {
+        if (getSessionPresenter() != null) {
+            ClientSession session = getSessionPresenter().getInstance();
+            formsFlushManager.flush(session, formElementUUID);
         }
+    }
+
+    @OnStartup
+    @SuppressWarnings("unused")
+    public void onStartup(final PlaceRequest place) {
+        superDoStartUp(place);
+        initDocks();
+        getWidget().init(this);
+    }
+
+    void superDoStartUp(final PlaceRequest place) {
+        super.doStartUp(place);
+    }
+
+    void initDocks() {
+        diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+        diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+    }
+
+    @OnOpen
+    @SuppressWarnings("unused")
+    public void onOpen() {
+        super.doOpen();
+    }
+
+    @OnClose
+    @SuppressWarnings("unused")
+    public void onClose() {
+        superOnClose();
+        closeDocks();
+    }
+
+    void superOnClose() {
+        super.doClose();
+    }
+
+    void closeDocks() {
+        diagramPropertiesDock.close();
+        diagramPreviewAndExplorerDock.close();
+    }
+
+    @OnFocus
+    @SuppressWarnings("unused")
+    public void onFocus() {
+        superDoFocus();
+        onDiagramLoad();
+    }
+
+    @Override
+    public void onDiagramLoad() {
+        final Optional<CanvasHandler> canvasHandler = Optional.ofNullable(getCanvasHandler());
+
+        canvasHandler.ifPresent(c -> {
+            final Metadata metadata = c.getDiagram().getMetadata();
+            metadata.setPath(makeMetadataPath(metadata.getRoot(), metadata.getTitle()));
+            openDocks();
+        });
+    }
+
+    private Path makeMetadataPath(final Path root,
+                                  final String title) {
+        final String uri = root.toURI();
+        return PathFactory.newPath(title, uri + "/" + title + ".bpmn");
+    }
+
+    void openDocks() {
+        diagramPropertiesDock.open();
+        diagramPreviewAndExplorerDock.open();
+    }
+
+    void superDoFocus() {
+        super.doFocus();
+    }
+
+    @OnLostFocus
+    @SuppressWarnings("unused")
+    public void onLostFocus() {
+        super.doLostFocus();
+    }
+
+    @Override
+    @WorkbenchPartTitleDecoration
+    public IsWidget getTitle() {
+        return super.getTitle();
     }
 
     @Override
@@ -433,34 +476,133 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
                 promises.create((success, failure) -> {
                     superOnClose();
                     diagramServices.transform(path,
-                                              value,
-                                              new ServiceCallback<Diagram>() {
+                            value,
+                            new ServiceCallback<Diagram>() {
 
-                                                  @Override
-                                                  public void onSuccess(final Diagram diagram) {
-                                                      getEditor().open(diagram,
-                                                                       new Viewer.Callback() {
-                                                                           @Override
-                                                                           public void onSuccess() {
-                                                                               success.onInvoke((Void) null);
-                                                                           }
+                                @Override
+                                public void onSuccess(final Diagram diagram) {
+                                    getEditor().open(diagram,
+                                            new Viewer.Callback() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    success.onInvoke((Void) null);
+                                                }
 
-                                                                           @Override
-                                                                           public void onError(ClientRuntimeError error) {
-                                                                               BPMNDiagramEditor.this.getEditor().onLoadError(error);
-                                                                               failure.onInvoke(error);
-                                                                           }
-                                                                       });
-                                                  }
+                                                @Override
+                                                public void onError(ClientRuntimeError error) {
+                                                    BPMNDiagramEditor.this.getEditor().onLoadError(error);
+                                                    failure.onInvoke(error);
+                                                }
+                                            });
+                                }
 
-                                                  @Override
-                                                  public void onError(final ClientRuntimeError error) {
-                                                      BPMNDiagramEditor.this.getEditor().onLoadError(error);
-                                                      failure.onInvoke(error);
-                                                  }
-                                              });
+                                @Override
+                                public void onError(final ClientRuntimeError error) {
+                                    BPMNDiagramEditor.this.getEditor().onLoadError(error);
+                                    failure.onInvoke(error);
+                                }
+                            });
                 });
         return promise;
+    }
+
+    @GetContent
+    @Override
+    public Promise getContent() {
+        flush();
+        validateDiagram(getCanvasHandler());
+
+        GWT.log("getContent 1 " + getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get().getClass().getCanonicalName());
+        GWT.log("getContent 2 " + getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get().getGraph().getContent().getClass().getCanonicalName());
+
+
+        //KogitoDiagramResourceImpl impl = getEditor().getEditorProxy().getContentSupplier().get();
+
+
+        DiagramImpl diagram = convert(getEditor().getEditorProxy().getContentSupplier().get().projectDiagram().get());
+
+        Definitions definitions = new Definitions();
+        List<BPMNViewDefinition> definitionList = new LinkedList<>();
+
+        GWT.log("1 " + diagram.getMetadata().getDefinitionSetId());
+        GWT.log("2 " + diagram.getMetadata().getPath().getFileName());
+        GWT.log("3 " + diagram.getMetadata().getPath().toURI());
+        GWT.log("4 " + diagram.getMetadata().getTitle());
+        GWT.log("5 " + diagram.getMetadata().getCanvasRootUUID());
+        GWT.log("6 " + diagram.getMetadata().getShapeSetId());
+        GWT.log("7 " + diagram.getMetadata().getProfileId());
+        GWT.log("8 " + diagram.getMetadata().getRoot());
+
+
+        diagram.getGraph().nodes().forEach(n -> {
+            org.kie.workbench.common.stunner.core.graph.impl.NodeImpl elm = (org.kie.workbench.common.stunner.core.graph.impl.NodeImpl) n;
+            GWT.log("n 1 " + elm + " " + elm.asNode().getClass().getCanonicalName());
+            GWT.log("n 2 " + elm + " " + elm.asNode().getContent().getClass().getCanonicalName());
+            BPMNDiagramImpl bpmnDiagram;
+            if (elm.asNode().getContent() instanceof org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl) {
+
+                org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl impl = (org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl) elm.asNode().getContent();
+
+                GWT.log("impl " + impl.getDefinition() + " " + impl.getDefinition().getClass().getCanonicalName());
+
+
+                if (impl.getDefinition() instanceof UserTask) {
+                    UserTask userTask = (UserTask) impl.getDefinition();
+                    GWT.log("            UserTask " + userTask);
+
+
+                    userTask.getExtensionElements();
+
+                    //GWT.log("JSON \n " + JSON.stringify(userTask));
+
+                    definitionList.add(userTask);
+
+                } else if (impl.getDefinition() instanceof BPMNDiagramImpl) {
+                    bpmnDiagram = (BPMNDiagramImpl) impl.getDefinition();
+                    definitions.setProcess(bpmnDiagram.getDiagramSet());
+                    definitions.getProcess().setDefinitionList(definitionList);
+                    definitions.setBpmnDiagram(bpmnDiagram);
+
+                    bpmnDiagram.getDiagramSet().getImports();
+
+                    bpmnDiagram.getDimensionsSet();
+                    bpmnDiagram.getAdvancedData();
+                    bpmnDiagram.getBackgroundSet();
+
+                    bpmnDiagram.getAdvancedData().getMetaDataAttributes().getValue();
+
+                }
+
+            }
+
+        });
+
+
+        //TODO
+        //BPMNDiagramImpl bpmnDiagram = new BPMNDiagramImpl();
+        //bpmnDiagram
+
+        try {
+            GWT.log("XML 1 \n" + Definitions_MapperImpl.INSTANCE.write(definitions));
+            //GWT.log("XML 2 \n"+ BPMNDiagramImpl_MapperImpl.INSTANCE.write(bpmnDiagram));
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        GWT.log("? " + diagram.getGraph().getContent());
+
+/*        org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet set = (org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet) diagram.getGraph().getContent();
+
+        GWT.log("SET " + set + " " + set.getClass().getCanonicalName());*/
+
+
+        //diagram.get
+
+        //getEditor().getEditorProxy().getContentSupplier().get()
+
+        //GWT.log("getContent 3 " + getEditor().getEditorProxy().getContentSupplier().get().xmlDiagram().get());
+
+        return diagramServices.transform(getEditor().getEditorProxy().getContentSupplier().get());
     }
 
     @Override
@@ -468,29 +610,71 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         setOriginalContentHash(getCurrentDiagramHash());
     }
 
-    void initDocks() {
-        diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
-        diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+    @WorkbenchPartTitle
+    public String getTitleText() {
+        return "";
     }
 
-    void openDocks() {
-        diagramPropertiesDock.open();
-        diagramPreviewAndExplorerDock.open();
+    @WorkbenchMenu
+    public void getMenus(final Consumer<Menus> menusConsumer) {
+        menusConsumer.accept(super.getMenus());
     }
 
-    void closeDocks() {
-        diagramPropertiesDock.close();
-        diagramPreviewAndExplorerDock.close();
+    @Override
+    protected void makeMenuBar() {
+        if (!menuBarInitialized) {
+            getMenuSessionItems().populateMenu(getFileMenuBuilder());
+            makeAdditionalStunnerMenus(getFileMenuBuilder());
+            menuBarInitialized = true;
+        }
+    }
+
+    @Override
+    public void open(final Diagram diagram,
+                     final Viewer.Callback callback) {
+        this.layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
+        super.open(diagram, callback);
+    }
+
+    @Override
+    @WorkbenchPartView
+    public IsWidget asWidget() {
+        return super.asWidget();
+    }
+
+    @OnMayClose
+    public boolean onMayClose() {
+        return super.mayClose();
+    }
+
+    @Override
+    public String getEditorIdentifier() {
+        return EDITOR_ID;
+    }
+
+    @GetPreview
+    public Promise getPreview() {
+        CanvasHandler canvasHandler = getCanvasHandler();
+        if (canvasHandler != null) {
+            return Promise.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
+        } else {
+            return Promise.resolve("");
+        }
     }
 
     void onFormsOpenedEvent(@Observes FormPropertiesOpened event) {
         formElementUUID = event.getUuid();
     }
 
-    void flush() {
-        if (getSessionPresenter() != null) {
-            ClientSession session = getSessionPresenter().getInstance();
-            formsFlushManager.flush(session, formElementUUID);
-        }
+    @FunctionalInterface
+    @JsFunction
+    public interface Serialize {
+        String onInvoke();
+    }
+
+    @FunctionalInterface
+    @JsFunction
+    public interface Deserialize {
+        void onInvoke(String xml);
     }
 }

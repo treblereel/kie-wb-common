@@ -14,24 +14,8 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto;
+@XmlSchema(namespace = "http://www.omg.org/spec/BPMN/20100524/DI", elementFormDefault = XmlNsForm.QUALIFIED)
+package org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name = "inputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class InputSet implements Data {
-
-    @XmlElement(name = "bpmn2:dataInputRefs")
-    private List<String> set;
-
-    public List<String> getSet() {
-        return set;
-    }
-
-    public void setSet(List<String> set) {
-        this.set = set;
-    }
-}
+import javax.xml.bind.annotation.XmlNsForm;
+import javax.xml.bind.annotation.XmlSchema;

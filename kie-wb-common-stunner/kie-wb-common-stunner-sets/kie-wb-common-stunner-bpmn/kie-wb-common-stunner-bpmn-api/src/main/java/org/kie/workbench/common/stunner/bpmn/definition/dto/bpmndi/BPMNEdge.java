@@ -14,24 +14,36 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto;
+package org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "inputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class InputSet implements Data {
+import org.kie.workbench.common.stunner.bpmn.definition.dto.di.Point;
+import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
 
-    @XmlElement(name = "bpmn2:dataInputRefs")
-    private List<String> set;
+@XmlRootElement
+public class BPMNEdge extends BPMNPlaneElement {
 
-    public List<String> getSet() {
-        return set;
+    private static final String TYPE = "edge_shape_";
+
+    @XmlUnwrappedCollection
+    private List<Point> waypoint;
+
+    public BPMNEdge() {
+
     }
 
-    public void setSet(List<String> set) {
-        this.set = set;
+    public BPMNEdge(String from, String to, String flow) {
+        super(TYPE + from + "ZZZ" + to, flow);
+    }
+
+    public List<Point> getWaypoint() {
+        return waypoint;
+    }
+
+    public void setWaypoint(List<Point> waypoint) {
+        this.waypoint = waypoint;
     }
 }

@@ -40,6 +40,7 @@ import org.kie.workbench.common.stunner.bpmn.definition.dto.Data;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.DataInput;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.DataInputAssociation;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.InputSet;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.OutputSet;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.MetaData;
 import org.kie.workbench.common.stunner.bpmn.definition.property.background.BackgroundSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.dimensions.RectangleDimensionsSet;
@@ -58,6 +59,7 @@ import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.rule.annotation.CanDock;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
 import org.kie.workbench.common.stunner.core.util.UUID;
+import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
 
 import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.AbstractEmbeddedFormsInitializer.COLLAPSIBLE_CONTAINER;
 import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.AbstractEmbeddedFormsInitializer.FIELD_CONTAINER_PARAM;
@@ -88,16 +90,20 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
     private Documentation documentation;
     @XmlElementWrapper(name = "extensionElements", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
     @XmlElement(name = "metaData")
+    @XmlUnwrappedCollection
     private List<MetaData> extensionElements;
     @XmlElementRefs({
             @XmlElementRef(name = "dataInput", type = DataInput.class),
             @XmlElementRef(name = "inputSet", type = InputSet.class),
+            @XmlElementRef(name = "outputSet", type = OutputSet.class)
     })
     @XmlElementWrapper(name = "ioSpecification", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+    @XmlUnwrappedCollection
     private List<Data> ioSpecification;
     @XmlElementRefs({
             @XmlElementRef(name = "dataInputAssociation", type = DataInputAssociation.class)
     })
+    @XmlUnwrappedCollection
     private List<BPMNProperty> bpmnProperties;
 
     public UserTask() {
@@ -196,6 +202,7 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
         metaDataList.add(new MetaData("elementname", this.executionSet.getTaskName().getValue()));
         metaDataList.add(new MetaData("customAsync", this.executionSet.getIsAsync().getValue().toString()));
         metaDataList.add(new MetaData("customAutoStart", this.executionSet.getAdHocAutostart().getValue().toString()));
+        metaDataList.add(new MetaData("customSLADueDate", this.executionSet.getSlaDueDate().getValue()));
         return metaDataList;
     }
 
@@ -204,6 +211,7 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
     }
 
     public List<Data> getIoSpecification() {
+
         List<Data> result = new ArrayList<>();
         result.add(new DataInput(getId(), "TaskNameInputX", executionSet.getTaskName().getValue()));
         result.add(new DataInput(getId(), "SkippableInputX", executionSet.getSkippable().getValue().toString()));

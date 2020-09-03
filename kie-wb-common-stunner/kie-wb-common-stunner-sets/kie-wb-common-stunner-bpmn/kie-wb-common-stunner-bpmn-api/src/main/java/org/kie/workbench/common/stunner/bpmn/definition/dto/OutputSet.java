@@ -16,14 +16,22 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.dto;
 
-import jsinterop.annotations.JsType;
+import java.util.List;
 
-import static jsinterop.annotations.JsPackage.GLOBAL;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-@JsType(isNative = true, namespace = GLOBAL)
-public class JSON {
+@XmlRootElement(name = "outputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+public class OutputSet implements Data {
 
-    public static native String stringify(Object obj);
+    @XmlElement(name = "bpmn2:dataInputRefs")
+    private List<String> set;
 
-    public static native Object parse(String obj);
+    public List<String> getSet() {
+        return set;
+    }
+
+    public void setSet(List<String> set) {
+        this.set = set;
+    }
 }

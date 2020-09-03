@@ -14,24 +14,35 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto;
-
-import java.util.List;
+package org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "inputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class InputSet implements Data {
+import org.kie.workbench.common.stunner.bpmn.definition.dto.dc.Bounds;
 
-    @XmlElement(name = "bpmn2:dataInputRefs")
-    private List<String> set;
+@XmlRootElement(name = "BPMNShape", namespace = "http://www.omg.org/spec/BPMN/20100524/DI")
+public class BPMNShape extends BPMNPlaneElement {
 
-    public List<String> getSet() {
-        return set;
+    private static final String TYPE = "shape_";
+
+    @XmlElement(name = "Bounds")
+    private Bounds bounds;
+
+    public BPMNShape() {
+
     }
 
-    public void setSet(List<String> set) {
-        this.set = set;
+    public BPMNShape(String id) {
+        super(TYPE + id, id);
+    }
+
+    public Bounds getBounds() {
+        return bounds;
+    }
+
+    public BPMNShape setBounds(Bounds bounds) {
+        this.bounds = bounds;
+        return this;
     }
 }

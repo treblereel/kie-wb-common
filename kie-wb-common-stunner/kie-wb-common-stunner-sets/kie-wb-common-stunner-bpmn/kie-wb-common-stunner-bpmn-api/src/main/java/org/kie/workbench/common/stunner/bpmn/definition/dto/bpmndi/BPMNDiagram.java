@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto;
-
-import java.util.List;
+package org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "inputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class InputSet implements Data {
+@XmlRootElement
+public class BPMNDiagram {
 
-    @XmlElement(name = "bpmn2:dataInputRefs")
-    private List<String> set;
+    @XmlElement(name = "BPMNPlane")
+    private BPMNPlane plane;
 
-    public List<String> getSet() {
-        return set;
+    public BPMNPlane getPlane() {
+        return plane;
     }
 
-    public void setSet(List<String> set) {
-        this.set = set;
+    public void setPlane(BPMNPlane plane) {
+        this.plane = plane;
     }
 }

@@ -48,6 +48,7 @@ import org.kie.workbench.common.stunner.bpmn.forms.model.ImportsFieldType;
 import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.PropertySet;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
+import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
 
 @Portable
 @Bindable
@@ -146,17 +147,17 @@ public class DiagramSet implements BaseDiagramSet {
     @XmlTransient
     private SLADueDate slaDueDate;
 
-    @XmlElementRefs({
-            @XmlElementRef(name = "userTask", type = UserTask.class),
-            //@XmlElementRef(name = "bpmn2:scriptTask", type = ScriptTask.class)
-    })
-    private List<BPMNViewDefinition> definitionList;
-
-    //@XmlAttribute(namespace = "bpmn2")
     @XmlElementWrapper(
             name = "extensionElements",
             namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+    @XmlUnwrappedCollection
     private List<MetaData> extensionElements;
+
+    @XmlElementRefs({
+            @XmlElementRef(name = "userTask", type = UserTask.class),
+    })
+    @XmlUnwrappedCollection
+    private List<BPMNViewDefinition> definitionList;
 
     public DiagramSet() {
         this(new Name(),

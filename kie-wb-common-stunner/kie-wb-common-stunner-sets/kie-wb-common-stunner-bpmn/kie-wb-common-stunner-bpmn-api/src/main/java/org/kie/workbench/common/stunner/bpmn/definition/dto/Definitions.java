@@ -20,16 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagram;
+import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.MetaData;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.DiagramSet;
 import org.treblereel.gwt.jackson.api.annotation.TargetNamespace;
 import org.treblereel.gwt.jackson.api.annotation.XMLMapper;
+import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
 
 @XMLMapper
+@XmlType(propOrder = {"itemDefinitions", "process", "bpmnDiagram"})
 @XmlRootElement(name = "definitions", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 @TargetNamespace(prefix = "bpmn2", namespace = "http://www.omg.org/bpmn20")
 public class Definitions {
@@ -40,12 +45,11 @@ public class Definitions {
     @XmlAttribute
     private String name;
 
-    //@XmlAttribute(name = "process")
     private DiagramSet process;
 
-/*
+    @XmlUnwrappedCollection
     private List<ItemDefinition> itemDefinitions = new ArrayList<>();
-*/
+
 
     @XmlAttribute
     private String exporter = "jBPM Process Modeler";
@@ -53,7 +57,9 @@ public class Definitions {
     @XmlAttribute
     private String exporterVersion = "2.0";
 
-    @XmlTransient
+    @XmlElementRefs({
+            @XmlElementRef(name = "BPMNDiagram", type = BPMNDiagramImpl.class)
+    })
     private BPMNDiagram bpmnDiagram;
 
     public String getId() {
@@ -108,5 +114,13 @@ public class Definitions {
 
     public void setProcess(DiagramSet process) {
         this.process = process;
+    }
+
+    public List<ItemDefinition> getItemDefinitions() {
+        return itemDefinitions;
+    }
+
+    public void setItemDefinitions(List<ItemDefinition> itemDefinitions) {
+        this.itemDefinitions = itemDefinitions;
     }
 }
