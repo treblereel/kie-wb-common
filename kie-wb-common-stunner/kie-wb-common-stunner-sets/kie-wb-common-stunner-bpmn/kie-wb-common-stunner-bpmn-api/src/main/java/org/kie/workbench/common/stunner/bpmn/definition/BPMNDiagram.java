@@ -16,8 +16,6 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
-
 import org.kie.workbench.common.stunner.bpmn.definition.property.background.BackgroundSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.cm.CaseManagementSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.BaseDiagramSet;
@@ -26,7 +24,6 @@ import org.kie.workbench.common.stunner.bpmn.definition.property.variables.BaseA
 import org.kie.workbench.common.stunner.bpmn.definition.property.variables.BaseProcessData;
 import org.kie.workbench.common.stunner.bpmn.definition.property.variables.HasProcessData;
 
-@XmlSeeAlso(BPMNDiagramImpl.class)
 public interface BPMNDiagram<D extends BaseDiagramSet, P extends BaseProcessData, S extends BaseAdvancedData> extends BPMNViewDefinition,
                                                                                                                       HasProcessData<P> {
 

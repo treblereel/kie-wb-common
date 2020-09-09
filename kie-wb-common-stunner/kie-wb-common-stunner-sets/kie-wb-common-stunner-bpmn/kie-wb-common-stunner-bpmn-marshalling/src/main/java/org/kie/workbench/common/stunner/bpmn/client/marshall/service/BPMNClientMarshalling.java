@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import org.eclipse.bpmn2.Definitions;
 import org.eclipse.bpmn2.DocumentRoot;
 import org.jboss.drools.DroolsPackage;
@@ -130,12 +131,24 @@ public class BPMNClientMarshalling {
         // needed to build the entire graph (including parent/child relationships)
         // thus, we can now walk the graph to issue all the commands
         // to draw it on our canvas
+
+        GWT.log("getDefinitions " + definitionResolver.getDefinitions().getId());
+
         final Diagram<Graph<DefinitionSet, Node>, Metadata> diagram =
                 typedFactoryManager.newDiagram(
                         definitionResolver.getDefinitions().getId(),
                         getDefinitionSetClass(),
                         metadata);
         final Graph<DefinitionSet, Node> graph = diagram.getGraph();
+
+        GWT.log("graph " + graph + " " + graph.nodes().getClass().getCanonicalName());
+
+        graph.nodes().forEach(node -> {
+            GWT.log("node " + node + " " + node.getClass().getCanonicalName());
+
+        });
+
+
         final GraphBuilder graphBuilder =
                 new GraphBuilder(
                         graph,

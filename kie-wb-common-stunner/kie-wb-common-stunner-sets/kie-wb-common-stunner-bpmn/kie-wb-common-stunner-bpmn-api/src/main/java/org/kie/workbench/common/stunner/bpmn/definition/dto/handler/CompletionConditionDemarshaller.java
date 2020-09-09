@@ -18,36 +18,24 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto.handler;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.kie.workbench.common.stunner.bpmn.definition.dto.Assignment;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.CompletionCondition;
 import org.treblereel.gwt.jackson.api.XMLDeserializationContext;
 import org.treblereel.gwt.jackson.api.XMLDeserializerParameters;
 import org.treblereel.gwt.jackson.api.custom.CustomXMLDeserializer;
 import org.treblereel.gwt.jackson.api.exception.XMLDeserializationException;
 import org.treblereel.gwt.jackson.api.stream.XMLReader;
 
-public class AssignmentDemarshaller extends CustomXMLDeserializer<Assignment> {
+public class CompletionConditionDemarshaller extends CustomXMLDeserializer<CompletionCondition> {
+
 
     @Override
-    protected Assignment doDeserialize(
-            XMLReader reader, XMLDeserializationContext ctx, XMLDeserializerParameters params)
-            throws XMLStreamException {
-        Assignment result = new Assignment();
-        reader.next();
-        reader.next();
-        result.setFrom(reader.nextValue());
-        reader.next();
-        reader.next();
-        reader.next();
-        result.setTo(reader.nextValue());
-        reader.next();
-        reader.next();
-        return result;
+    public CompletionCondition deserialize(String value, XMLDeserializationContext ctx, XMLDeserializerParameters params) throws XMLDeserializationException {
+        return new CompletionCondition(value);
     }
 
     @Override
-    public Assignment deserialize(
-            String value, XMLDeserializationContext ctx, XMLDeserializerParameters params)
-            throws XMLDeserializationException {
-        throw new Error();
+    protected CompletionCondition doDeserialize(XMLReader reader, XMLDeserializationContext ctx, XMLDeserializerParameters params) throws XMLStreamException {
+        reader.next();
+        return new CompletionCondition(reader.nextValue());
     }
 }

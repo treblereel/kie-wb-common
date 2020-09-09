@@ -16,14 +16,15 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.property.diagram;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -39,6 +40,8 @@ import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.selectors.l
 import org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.textArea.type.TextAreaFieldType;
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNViewDefinition;
 import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.ExtensionElement;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.Import;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.MetaData;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.imports.Imports;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Documentation;
@@ -147,30 +150,35 @@ public class DiagramSet implements BaseDiagramSet {
     @XmlTransient
     private SLADueDate slaDueDate;
 
-    @XmlElementWrapper(
-            name = "extensionElements",
-            namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+    @XmlElementRefs({
+            @XmlElementRef(name = "metaData", type = MetaData.class),
+            @XmlElementRef(name = "import", type = Import.class),
+    })
+    @XmlElement(name = "extensionElements", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+    private List<ExtensionElement> extensionElements = new ArrayList<>();
+
     @XmlUnwrappedCollection
-    private List<MetaData> extensionElements;
+    @XmlElement(name = "property", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+    private List<org.kie.workbench.common.stunner.bpmn.definition.dto.Property> properties;
 
     @XmlElementRefs({
             @XmlElementRef(name = "userTask", type = UserTask.class),
     })
     @XmlUnwrappedCollection
-    private List<BPMNViewDefinition> definitionList;
+    private List<BPMNViewDefinition> definitionList = new ArrayList<>();
 
     public DiagramSet() {
         this(new Name(),
-             new Documentation(),
-             new Id(),
-             new Package(),
-             new ProcessType(),
-             new Version(),
-             new AdHoc(),
-             new ProcessInstanceDescription(),
-             new Imports(),
-             new Executable(),
-             new SLADueDate());
+                new Documentation(),
+                new Id(),
+                new Package(),
+                new ProcessType(),
+                new Version(),
+                new AdHoc(),
+                new ProcessInstanceDescription(),
+                new Imports(),
+                new Executable(),
+                new SLADueDate());
     }
 
     public DiagramSet(final @MapsTo("name") Name name,
@@ -199,16 +207,16 @@ public class DiagramSet implements BaseDiagramSet {
 
     public DiagramSet(final String name) {
         this(new Name(name),
-             new Documentation(),
-             new Id(),
-             new Package(),
-             new ProcessType(),
-             new Version(),
-             new AdHoc(),
-             new ProcessInstanceDescription(),
-             new Imports(),
-             new Executable(),
-             new SLADueDate());
+                new Documentation(),
+                new Id(),
+                new Package(),
+                new ProcessType(),
+                new Version(),
+                new AdHoc(),
+                new ProcessInstanceDescription(),
+                new Imports(),
+                new Executable(),
+                new SLADueDate());
     }
 
     @Override
@@ -239,6 +247,11 @@ public class DiagramSet implements BaseDiagramSet {
     }
 
     @Override
+    public AdHoc getAdHoc() {
+        return adHoc;
+    }
+
+    @Override
     public Package getPackageProperty() {
         return packageProperty;
     }
@@ -248,30 +261,17 @@ public class DiagramSet implements BaseDiagramSet {
     }
 
     @Override
+    public Version getVersion() {
+        return version;
+    }
+
+    @Override
     public ProcessType getProcessType() {
         return processType;
     }
 
     public void setProcessType(ProcessType processType) {
         this.processType = processType;
-    }
-
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    public void setVersion(final Version version) {
-        this.version = version;
-    }
-
-    @Override
-    public AdHoc getAdHoc() {
-        return adHoc;
-    }
-
-    public void setAdHoc(final AdHoc adHoc) {
-        this.adHoc = adHoc;
     }
 
     @Override
@@ -310,19 +310,35 @@ public class DiagramSet implements BaseDiagramSet {
         this.slaDueDate = slaDueDate;
     }
 
+    public void setVersion(final Version version) {
+        this.version = version;
+    }
+
+    public void setAdHoc(final AdHoc adHoc) {
+        this.adHoc = adHoc;
+    }
+
+    public List<org.kie.workbench.common.stunner.bpmn.definition.dto.Property> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<org.kie.workbench.common.stunner.bpmn.definition.dto.Property> properties) {
+        this.properties = properties;
+    }
+
     @Override
     public int hashCode() {
         return HashUtil.combineHashCodes(Objects.hashCode(name),
-                                         Objects.hashCode(documentation),
-                                         Objects.hashCode(id),
-                                         Objects.hashCode(packageProperty),
-                                         Objects.hashCode(processType),
-                                         Objects.hashCode(version),
-                                         Objects.hashCode(adHoc),
-                                         Objects.hashCode(processInstanceDescription),
-                                         Objects.hashCode(imports),
-                                         Objects.hashCode(executable),
-                                         Objects.hashCode(slaDueDate));
+                Objects.hashCode(documentation),
+                Objects.hashCode(id),
+                Objects.hashCode(packageProperty),
+                Objects.hashCode(processType),
+                Objects.hashCode(version),
+                Objects.hashCode(adHoc),
+                Objects.hashCode(processInstanceDescription),
+                Objects.hashCode(imports),
+                Objects.hashCode(executable),
+                Objects.hashCode(slaDueDate));
     }
 
     @Override
@@ -352,11 +368,11 @@ public class DiagramSet implements BaseDiagramSet {
         this.definitionList = definitionList;
     }
 
-    public List<MetaData> getExtensionElements() {
+    public List<ExtensionElement> getExtensionElements() {
         return extensionElements;
     }
 
-    public void setExtensionElements(List<MetaData> extensionElements) {
-        this.extensionElements = extensionElements;
+    public void setExtensionElements(List<ExtensionElement> extensionElements) {
+        this.extensionElements.addAll(extensionElements);
     }
 }

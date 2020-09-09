@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.dto.converter.from;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.ItemDefinition;
@@ -69,14 +70,20 @@ public class UserTaskConverter {
         }
 
         if (Boolean.TRUE.equals(executionSet.getIsMultipleInstance().getValue())) {
-            if (executionSet.getMultipleInstanceCollectionInput().getValue() != null) {
+            GWT.log("1 " + executionSet.getMultipleInstanceCollectionInput().getValue());
+            GWT.log("2 " + executionSet.getMultipleInstanceCollectionOutput().getValue());
+            GWT.log("3 " + executionSet.getMultipleInstanceDataInput().getValue());
+            GWT.log("3 " + executionSet.getMultipleInstanceDataInput().getValue());
+            GWT.log("4 " + executionSet.getMultipleInstanceDataOutput().getValue());
 
-                String[] value = executionSet.getMultipleInstanceCollectionInput().getValue().split(":");
+
+            if (executionSet.getMultipleInstanceDataInput().getValue() != null) {
+                String[] value = executionSet.getMultipleInstanceDataInput().getValue().split(":");
                 definitions.getItemDefinitions().add(new ItemDefinition(userTask.getId(),
                         "multiInstanceItemType_" + value[0], value[1]));
             }
-            if (executionSet.getMultipleInstanceCollectionOutput().getValue() != null) {
-                String[] value = executionSet.getMultipleInstanceCollectionOutput().getValue().split(":");
+            if (executionSet.getMultipleInstanceDataOutput().getValue() != null) {
+                String[] value = executionSet.getMultipleInstanceDataOutput().getValue().split(":");
                 definitions.getItemDefinitions().add(new ItemDefinition(userTask.getId(),
                         "multiInstanceItemType_" + value[0], value[1]));
             }

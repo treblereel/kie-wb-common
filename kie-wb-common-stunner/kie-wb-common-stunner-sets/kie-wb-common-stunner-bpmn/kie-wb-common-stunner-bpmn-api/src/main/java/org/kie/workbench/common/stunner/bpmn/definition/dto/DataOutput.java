@@ -19,14 +19,10 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "dataInput", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class DataInput implements Data {
-
+@XmlRootElement(name = "dataOutput", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+public class DataOutput {
     @XmlAttribute
     private String id;
-
-    @XmlAttribute(name = "drools:dtype")
-    private String dtype;
 
     @XmlAttribute
     private String itemSubjectRef;
@@ -34,19 +30,14 @@ public class DataInput implements Data {
     @XmlAttribute
     private String name;
 
-    public DataInput() {
+    public DataOutput() {
 
     }
 
-    public DataInput(String id, String postfix, String name) {
-        this.id = id +"_" + postfix;
-        this.itemSubjectRef = id +"_" + postfix + "Item";
+    public DataOutput(String id, String postfix, String name) {
+        this.id = id + "_" + postfix;
+        this.itemSubjectRef = id + "_" + postfix + "Item";
         this.name = name;
-    }
-
-    public DataInput(String id, String postfix, String name, String dtype) {
-        this(id, postfix, name);
-        this.dtype = dtype;
     }
 
     public String getId() {
@@ -55,14 +46,6 @@ public class DataInput implements Data {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getDtype() {
-        return dtype;
-    }
-
-    public void setDtype(String dtype) {
-        this.dtype = dtype;
     }
 
     public String getItemSubjectRef() {

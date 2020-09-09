@@ -16,23 +16,26 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.dto;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
+@XmlRootElement(name = "sourceRef", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+public class SourceRef {
 
-@XmlRootElement(name = "inputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class InputSet implements Data {
+    private String value;
 
-    @XmlUnwrappedCollection
-    private List<DataInputRefs> dataInputRefs;
+    public SourceRef() {
 
-    public List<DataInputRefs> getDataInputRefs() {
-        return dataInputRefs;
     }
 
-    public void setDataInputRefs(List<DataInputRefs> dataInputRefs) {
-        this.dataInputRefs = dataInputRefs;
+    public SourceRef(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

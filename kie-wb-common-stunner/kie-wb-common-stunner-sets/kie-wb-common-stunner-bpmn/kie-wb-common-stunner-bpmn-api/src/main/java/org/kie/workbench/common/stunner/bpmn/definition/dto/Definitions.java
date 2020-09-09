@@ -20,21 +20,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagram;
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl;
-import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.MetaData;
+import org.kie.workbench.common.stunner.bpmn.definition.Relationship;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.DiagramSet;
 import org.treblereel.gwt.jackson.api.annotation.TargetNamespace;
 import org.treblereel.gwt.jackson.api.annotation.XMLMapper;
 import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
 
 @XMLMapper
-@XmlType(propOrder = {"itemDefinitions", "process", "bpmnDiagram"})
+@XmlType(propOrder = {"import", "itemDefinition", "process", "BPMNDiagram"})
 @XmlRootElement(name = "definitions", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 @TargetNamespace(prefix = "bpmn2", namespace = "http://www.omg.org/bpmn20")
 public class Definitions {
@@ -45,22 +43,33 @@ public class Definitions {
     @XmlAttribute
     private String name;
 
-    private DiagramSet process;
-
-    @XmlUnwrappedCollection
-    private List<ItemDefinition> itemDefinitions = new ArrayList<>();
-
-
     @XmlAttribute
     private String exporter = "jBPM Process Modeler";
 
     @XmlAttribute
     private String exporterVersion = "2.0";
 
-    @XmlElementRefs({
-            @XmlElementRef(name = "BPMNDiagram", type = BPMNDiagramImpl.class)
-    })
-    private BPMNDiagram bpmnDiagram;
+    @XmlUnwrappedCollection
+    @XmlElement(name = "import")
+    private List<Import> imports = new ArrayList<>();
+
+    private DiagramSet process;
+
+    @XmlUnwrappedCollection
+    @XmlElement(name = "itemDefinition")
+    private List<ItemDefinition> itemDefinitions = new ArrayList<>();
+    //TODO
+    @XmlElement(name = "BPMNDiagram")
+    private BPMNDiagramImpl bpmnDiagram;
+    private Relationship relationship;
+
+    public BPMNDiagramImpl getBpmnDiagram() {
+        return bpmnDiagram;
+    }
+
+    public void setBpmnDiagram(BPMNDiagramImpl bpmnDiagram) {
+        this.bpmnDiagram = bpmnDiagram;
+    }
 
     public String getId() {
         return id;
@@ -94,20 +103,6 @@ public class Definitions {
         this.exporterVersion = exporterVersion;
     }
 
-    public BPMNDiagram getBpmnDiagram() {
-        return bpmnDiagram;
-    }
-
-    public void setBpmnDiagram(BPMNDiagram bpmnDiagram) {
-        this.bpmnDiagram = bpmnDiagram;
-
-        //process.getExtensionElements()
-        List<MetaData>  extensionElements = new ArrayList<>();
-        extensionElements.add(new MetaData("customDescription",
-                bpmnDiagram.getAdvancedData().getMetaDataAttributes().getValue()));
-        process.setExtensionElements(extensionElements);
-    }
-
     public DiagramSet getProcess() {
         return process;
     }
@@ -122,5 +117,36 @@ public class Definitions {
 
     public void setItemDefinitions(List<ItemDefinition> itemDefinitions) {
         this.itemDefinitions = itemDefinitions;
+    }
+
+    public Relationship getRelationship() {
+        return relationship;
+    }
+
+    public void setRelationship(Relationship relationship) {
+        this.relationship = relationship;
+    }
+
+    public List<Import> getImports() {
+        return imports;
+    }
+
+    public void setImports(List<Import> imports) {
+        this.imports = imports;
+    }
+
+    @Override
+    public String toString() {
+        return "Definitions{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", exporter='" + exporter + '\'' +
+                ", exporterVersion='" + exporterVersion + '\'' +
+                ", imports=" + imports +
+                ", process=" + process +
+                ", itemDefinitions=" + itemDefinitions +
+                ", bpmnDiagram=" + bpmnDiagram +
+                ", relationship=" + relationship +
+                '}';
     }
 }

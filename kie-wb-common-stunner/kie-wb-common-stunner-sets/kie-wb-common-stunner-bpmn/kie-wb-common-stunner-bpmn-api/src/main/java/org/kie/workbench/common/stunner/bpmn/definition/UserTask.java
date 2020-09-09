@@ -20,12 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -39,9 +37,17 @@ import org.kie.workbench.common.forms.adf.definitions.settings.FieldPolicy;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.Data;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.DataInput;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.DataInputAssociation;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.DataInputRefs;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.DataOutput;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.DataOutputAssociation;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.InputSet;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.MultiInstanceLoopCharacteristics;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.OutputSet;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.ExtensionElement;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.Import;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.MetaData;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.OnEntryScript;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.drools.OnExitScript;
 import org.kie.workbench.common.stunner.bpmn.definition.property.background.BackgroundSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.dimensions.RectangleDimensionsSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.font.FontSet;
@@ -49,6 +55,7 @@ import org.kie.workbench.common.stunner.bpmn.definition.property.general.Documen
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.Name;
 import org.kie.workbench.common.stunner.bpmn.definition.property.general.TaskGeneralSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.simulation.SimulationSet;
+import org.kie.workbench.common.stunner.bpmn.definition.property.task.ScriptTypeValue;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.TaskType;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.TaskTypes;
 import org.kie.workbench.common.stunner.bpmn.definition.property.task.UserTaskExecutionSet;
@@ -88,27 +95,33 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
     private String id = UUID.uuid();
     private Name name;
     private Documentation documentation;
-    @XmlElementWrapper(name = "extensionElements", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-    @XmlElement(name = "metaData")
-    @XmlUnwrappedCollection
-    private List<MetaData> extensionElements;
+    @XmlElementRefs({
+            @XmlElementRef(name = "metaData", type = MetaData.class),
+            @XmlElementRef(name = "import", type = Import.class),
+            @XmlElementRef(name = "onEntry-script", type = OnEntryScript.class),
+            @XmlElementRef(name = "onExit-script", type = OnExitScript.class),
+    })
+    @XmlElement(name = "extensionElements", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+    private List<ExtensionElement> extensionElements;
     @XmlElementRefs({
             @XmlElementRef(name = "dataInput", type = DataInput.class),
+            @XmlElementRef(name = "dataOutput", type = DataOutput.class),
             @XmlElementRef(name = "inputSet", type = InputSet.class),
             @XmlElementRef(name = "outputSet", type = OutputSet.class)
     })
-    @XmlElementWrapper(name = "ioSpecification", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-    @XmlUnwrappedCollection
+    @XmlElement(name = "ioSpecification", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
     private List<Data> ioSpecification;
     @XmlElementRefs({
-            @XmlElementRef(name = "dataInputAssociation", type = DataInputAssociation.class)
+            @XmlElementRef(name = "dataInputAssociation", type = DataInputAssociation.class),
+            @XmlElementRef(name = "dataOutputAssociation", type = DataOutputAssociation.class),
+            @XmlElementRef(name = "multiInstanceLoopCharacteristics", type = MultiInstanceLoopCharacteristics.class)
     })
     @XmlUnwrappedCollection
     private List<BPMNProperty> bpmnProperties;
 
     public UserTask() {
-        this(new Name("TaskZZZ"),
-                new Documentation("DocumentationZZZ"),
+        this(new Name("Task"),
+                new Documentation(""),
                 new UserTaskExecutionSet(),
                 new BackgroundSet(),
                 new FontSet(),
@@ -197,16 +210,36 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
         this.bpmnProperties = bpmnProperties;
     }
 
-    public List<MetaData> getExtensionElements() {
-        List<MetaData> metaDataList = new ArrayList<>();
-        metaDataList.add(new MetaData("elementname", this.executionSet.getTaskName().getValue()));
-        metaDataList.add(new MetaData("customAsync", this.executionSet.getIsAsync().getValue().toString()));
-        metaDataList.add(new MetaData("customAutoStart", this.executionSet.getAdHocAutostart().getValue().toString()));
-        metaDataList.add(new MetaData("customSLADueDate", this.executionSet.getSlaDueDate().getValue()));
+    public List<ExtensionElement> getExtensionElements() {
+        List<ExtensionElement> metaDataList = new ArrayList<>();
+        if (this.executionSet.getTaskName().getValue() != null) {
+            metaDataList.add(new MetaData("elementname", this.executionSet.getTaskName().getValue()));
+        }
+        if (this.executionSet.getIsAsync().getValue() != null) {
+            metaDataList.add(new MetaData("customAsync", this.executionSet.getIsAsync().getValue().toString()));
+        }
+        if (this.executionSet.getAdHocAutostart().getValue() != null) {
+            metaDataList.add(new MetaData("customAutoStart", this.executionSet.getAdHocAutostart().getValue().toString()));
+        }
+        if (this.executionSet.getAdHocAutostart().getValue() != null) {
+            metaDataList.add(new MetaData("customSLADueDate", this.executionSet.getSlaDueDate().getValue()));
+        }
+        for (ScriptTypeValue value : this.executionSet.getOnExitAction().getValue().getValues()) {
+            if (!value.getScript().isEmpty()) {
+                metaDataList.add(new OnExitScript(value.getScript(), value.getLanguage()));
+            }
+        }
+
+        for (ScriptTypeValue value : this.executionSet.getOnEntryAction().getValue().getValues()) {
+            if (!value.getScript().isEmpty()) {
+                metaDataList.add(new OnEntryScript(value.getScript(), value.getLanguage()));
+            }
+        }
+
         return metaDataList;
     }
 
-    public void setExtensionElements(List<MetaData> extensionElements) {
+    public void setExtensionElements(List<ExtensionElement> extensionElements) {
         this.extensionElements = extensionElements;
     }
 
@@ -220,14 +253,14 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
         result.add(new DataInput(getId(), "ContentInputX", executionSet.getContent().getValue()));
 
         InputSet inputSet = new InputSet();
-        List<String> list = new ArrayList<>();
-        list.add(getId() + "_TaskNameInputX");
-        list.add(getId() + "_SkippableInputX");
-        list.add(getId() + "_CommentInputX");
-        list.add(getId() + "_DescriptionInputX");
-        list.add(getId() + "_PriorityInputX");
-        list.add(getId() + "_ContentInputX");
-        inputSet.setSet(list);
+        List<DataInputRefs> list = new ArrayList<>();
+        list.add(new DataInputRefs(getId() + "_TaskNameInputX"));
+        list.add(new DataInputRefs(getId() + "_SkippableInputX"));
+        list.add(new DataInputRefs(getId() + "_CommentInputX"));
+        list.add(new DataInputRefs(getId() + "_DescriptionInputX"));
+        list.add(new DataInputRefs(getId() + "_PriorityInputX"));
+        list.add(new DataInputRefs(getId() + "_ContentInputX"));
+        inputSet.setDataInputRefs(list);
         result.add(inputSet);
         return result;
     }

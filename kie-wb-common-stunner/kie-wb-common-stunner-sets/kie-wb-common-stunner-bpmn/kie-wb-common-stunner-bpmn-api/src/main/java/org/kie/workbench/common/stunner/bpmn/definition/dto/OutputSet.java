@@ -18,20 +18,21 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
 
 @XmlRootElement(name = "outputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 public class OutputSet implements Data {
 
-    @XmlElement(name = "bpmn2:dataInputRefs")
-    private List<String> set;
+    @XmlUnwrappedCollection
+    private List<DataOutputRefs> dataOutputRefs;
 
-    public List<String> getSet() {
-        return set;
+    public List<DataOutputRefs> getDataOutputRefs() {
+        return dataOutputRefs;
     }
 
-    public void setSet(List<String> set) {
-        this.set = set;
+    public void setDataOutputRefs(List<DataOutputRefs> dataOutputRefs) {
+        this.dataOutputRefs = dataOutputRefs;
     }
 }

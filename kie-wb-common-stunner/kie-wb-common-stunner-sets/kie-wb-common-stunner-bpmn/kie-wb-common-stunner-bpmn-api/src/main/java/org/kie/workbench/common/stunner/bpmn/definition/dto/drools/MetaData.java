@@ -16,43 +16,45 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.dto.drools;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlCData;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "metaData", namespace = "http://www.jboss.org/drools")
-public class MetaData {
+public class MetaData extends ExtensionElement {
 
-    @XmlAttribute
-    private String name;
-
-    @XmlCData
-    @XmlElement(name = "drools:metaValue")
-    private String metaValue;
+    private MetaValue metaValue;
 
     public MetaData() {
 
     }
 
     public MetaData(String name, String metaValue) {
-        this.name = name;
-        this.metaValue = metaValue;
+        super(name);
+        this.metaValue = new MetaValue(metaValue);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getMetaValue() {
+    public MetaValue getMetaValue() {
         return metaValue;
     }
 
-    public void setMetaValue(String metaValue) {
+    public void setMetaValue(MetaValue metaValue) {
         this.metaValue = metaValue;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){ return true; }
+        if (!(o instanceof MetaData)){ return false;}
+        if (!super.equals(o)){ return false;}
+
+        MetaData metaData = (MetaData) o;
+
+        return getMetaValue() != null ? getMetaValue().equals(metaData.getMetaValue()) : metaData.getMetaValue() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (getMetaValue() != null ? getMetaValue().hashCode() : 0);
+        return result;
     }
 }

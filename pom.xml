@@ -140,6 +140,11 @@
       </dependency>
       <dependency>
         <groupId>org.treblereel.gwt.jackson</groupId>
+        <artifactId>jre-backend</artifactId>
+        <version>${version.xml.marshalling}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.treblereel.gwt.jackson</groupId>
         <artifactId>api</artifactId>
         <version>${version.xml.marshalling}</version>
       </dependency>
@@ -247,6 +252,15 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.treblereel.gwt.jackson:gwt-backend</classpathDependencyExclude>
+          </classpathDependencyExcludes>
+        </configuration>
       </plugin>
     </plugins>
 

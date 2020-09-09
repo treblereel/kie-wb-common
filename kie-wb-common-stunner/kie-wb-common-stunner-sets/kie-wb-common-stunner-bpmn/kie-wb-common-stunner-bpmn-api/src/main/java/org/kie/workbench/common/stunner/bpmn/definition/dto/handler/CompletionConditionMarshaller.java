@@ -18,27 +18,15 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto.handler;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.kie.workbench.common.stunner.bpmn.definition.dto.Assignment;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.CompletionCondition;
 import org.treblereel.gwt.jackson.api.XMLSerializationContext;
 import org.treblereel.gwt.jackson.api.XMLSerializerParameters;
 import org.treblereel.gwt.jackson.api.custom.CustomXMLSerializer;
 import org.treblereel.gwt.jackson.api.stream.XMLWriter;
 
-public class AssignmentMarshaller extends CustomXMLSerializer<Assignment> {
-
+public class CompletionConditionMarshaller extends CustomXMLSerializer<CompletionCondition>  {
     @Override
-    protected void doSerialize(
-            XMLWriter writer, Assignment value, XMLSerializationContext ctx, XMLSerializerParameters params)
-            throws XMLStreamException {
-        writer.beginObject("bpmn2:assignment");
-        writer.beginObject("bpmn2:from");
-        writer.writeAttribute("xsi:type", "bpmn2:tFormalExpression");
-        writer.writeCData(value.getFrom());
-        writer.endObject();
-        writer.beginObject("bpmn2:to");
-        writer.writeAttribute("xsi:type", "bpmn2:tFormalExpression");
-        writer.writeCData(value.getTo());
-        writer.endObject();
-        writer.endObject();
+    protected void doSerialize(XMLWriter writer, CompletionCondition value, XMLSerializationContext ctx, XMLSerializerParameters params) throws XMLStreamException {
+        writer.writeCData(value.getValue());
     }
 }

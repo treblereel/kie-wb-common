@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto;
-
-import java.util.List;
+package org.kie.workbench.common.stunner.bpmn.definition.dto.drools;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
+@XmlRootElement(name = "onEntry-script", namespace = "http://www.jboss.org/drools")
+public class OnEntryScript extends Script {
 
-@XmlRootElement(name = "inputSet", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class InputSet implements Data {
-
-    @XmlUnwrappedCollection
-    private List<DataInputRefs> dataInputRefs;
-
-    public List<DataInputRefs> getDataInputRefs() {
-        return dataInputRefs;
+    public OnEntryScript() {
     }
 
-    public void setDataInputRefs(List<DataInputRefs> dataInputRefs) {
-        this.dataInputRefs = dataInputRefs;
+    public OnEntryScript(String script, String language) {
+        super(script, language);
     }
 }

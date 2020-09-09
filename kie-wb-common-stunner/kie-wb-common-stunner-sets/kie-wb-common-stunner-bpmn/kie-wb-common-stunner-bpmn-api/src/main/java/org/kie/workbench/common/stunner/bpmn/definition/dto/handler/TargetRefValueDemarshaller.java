@@ -18,36 +18,26 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto.handler;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.kie.workbench.common.stunner.bpmn.definition.dto.Assignment;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.TargetRef;
 import org.treblereel.gwt.jackson.api.XMLDeserializationContext;
 import org.treblereel.gwt.jackson.api.XMLDeserializerParameters;
 import org.treblereel.gwt.jackson.api.custom.CustomXMLDeserializer;
 import org.treblereel.gwt.jackson.api.exception.XMLDeserializationException;
 import org.treblereel.gwt.jackson.api.stream.XMLReader;
 
-public class AssignmentDemarshaller extends CustomXMLDeserializer<Assignment> {
+public class TargetRefValueDemarshaller extends CustomXMLDeserializer<TargetRef.TargetRefValue> {
 
     @Override
-    protected Assignment doDeserialize(
+    protected TargetRef.TargetRefValue doDeserialize(
             XMLReader reader, XMLDeserializationContext ctx, XMLDeserializerParameters params)
             throws XMLStreamException {
-        Assignment result = new Assignment();
-        reader.next();
-        reader.next();
-        result.setFrom(reader.nextValue());
-        reader.next();
-        reader.next();
-        reader.next();
-        result.setTo(reader.nextValue());
-        reader.next();
-        reader.next();
-        return result;
+        return new TargetRef.TargetRefValue(reader.nextString());
     }
 
     @Override
-    public Assignment deserialize(
+    public TargetRef.TargetRefValue deserialize(
             String value, XMLDeserializationContext ctx, XMLDeserializerParameters params)
             throws XMLDeserializationException {
-        throw new Error();
+        return new TargetRef.TargetRefValue(value);
     }
 }

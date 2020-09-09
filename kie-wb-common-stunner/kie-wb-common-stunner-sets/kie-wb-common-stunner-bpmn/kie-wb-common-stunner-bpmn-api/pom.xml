@@ -250,6 +250,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.treblereel.gwt.jackson</groupId>
+      <artifactId>jre-backend</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <scope>test</scope>

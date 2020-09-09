@@ -21,22 +21,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNProperty;
 import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
 
-@XmlRootElement(name = "dataInput", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
-public class DataInputAssociation implements BPMNProperty {
+@XmlRootElement(name = "dataOutputAssociation", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
+public class DataOutputAssociation implements BPMNProperty {
 
     private SourceRef sourceRef;
 
     private TargetRef targetRef;
 
-    private Assignment assignment;
-
-    public DataInputAssociation() {
+    public DataOutputAssociation() {
 
     }
 
-    public DataInputAssociation(UserTask userTask, String value, String postfix) {
-        targetRef = new TargetRef(userTask.getId() + "_" + postfix);
-        assignment = new Assignment(value, userTask.getId(), postfix);
+    public DataOutputAssociation(UserTask userTask, String value, String postfix) {
+        sourceRef = new SourceRef(userTask.getId() + "_" + value + postfix);
+        targetRef = new TargetRef(value);
     }
 
     public SourceRef getSourceRef() {
@@ -53,14 +51,6 @@ public class DataInputAssociation implements BPMNProperty {
 
     public void setTargetRef(TargetRef targetRef) {
         this.targetRef = targetRef;
-    }
-
-    public Assignment getAssignment() {
-        return assignment;
-    }
-
-    public void setAssignment(Assignment assignment) {
-        this.assignment = assignment;
     }
 
 }

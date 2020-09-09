@@ -78,4 +78,14 @@ public class Bounds {
     public void setY(double y) {
         this.y = y;
     }
+
+    @Override
+    public String toString() {
+        return "Bounds{" +
+                "height=" + height +
+                ", width=" + width +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }
