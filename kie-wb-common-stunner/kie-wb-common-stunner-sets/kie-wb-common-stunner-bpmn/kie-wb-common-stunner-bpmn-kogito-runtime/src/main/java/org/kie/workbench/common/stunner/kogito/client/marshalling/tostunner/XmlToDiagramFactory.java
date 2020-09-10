@@ -77,12 +77,12 @@ public class XmlToDiagramFactory {
 /*            definitions.getImports().stream().map(imp -> new WSDLImport(imp.getLocation(), imp.getNamespace()))
                     .forEach(imp -> bpmnDiagram.getDiagramSet().getImports().getValue().getWSDLImports().add(imp));*/
 
-            definitions.getBpmnDiagram().getPlane()
+/*            definitions.getBpmnDiagram().getPlane()
                     .getElements()
                     .stream().forEach(e -> {
                 GWT.log("BPMNShape '" + e.getId() + "'" + e.getClass().getCanonicalName());
 
-            });
+            });*/
 
 
             definitions.getProcess().getDefinitionList().forEach(definition -> {
@@ -111,10 +111,9 @@ public class XmlToDiagramFactory {
             });
 
             //GWT.log("? " + definitions.getBpmnDiagram() + " " + definitions.getBpmnDiagram().getClass().getCanonicalName());
-            definitions.getBpmnDiagram().getPlane().getElements().forEach(elm -> {
+/*            definitions.getBpmnDiagram().getPlane().getElements().forEach(elm -> {
                 GWT.log("PLANE " + elm + " " + elm.getClass().getSimpleName());
-            });
-
+            });*/
 
             return diagram;
         } catch (XMLStreamException e) {

@@ -206,7 +206,8 @@ public class DiagramToXmlFactory {
         });
 
         try {
-            XMLSerializationContext context = DefaultXMLSerializationContext.builder().writeEmptyXMLArrays(false).build();
+            XMLSerializationContext context = DefaultXMLSerializationContext.builder()
+                    .writeEmptyXMLArrays(false).build();
 
             return Definitions_MapperImpl.INSTANCE.write(definitions, context);
         } catch (XMLStreamException e) {
