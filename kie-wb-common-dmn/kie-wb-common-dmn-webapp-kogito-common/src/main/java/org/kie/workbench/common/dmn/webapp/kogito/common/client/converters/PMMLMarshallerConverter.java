@@ -17,14 +17,11 @@ package org.kie.workbench.common.dmn.webapp.kogito.common.client.converters;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.appformer.kogito.bridge.client.pmmleditor.marshaller.model.PMMLDocumentData;
 import org.kie.workbench.common.dmn.api.editors.included.DMNImportTypes;
 import org.kie.workbench.common.dmn.api.editors.included.PMMLDocumentMetadata;
 import org.kie.workbench.common.dmn.api.editors.included.PMMLModelMetadata;
-import org.kie.workbench.common.dmn.api.editors.included.PMMLParameterMetadata;
 
 public class PMMLMarshallerConverter {
 
@@ -37,13 +34,13 @@ public class PMMLMarshallerConverter {
     public static PMMLDocumentMetadata fromJSInteropToMetadata(final String pmmlFilePath,
                                                                final PMMLDocumentData pmmlDocumentData) {
         final List<PMMLModelMetadata> models = new ArrayList<>();
-        pmmlDocumentData.getModels().stream().forEach(pmmlModelData -> {
+/*        pmmlDocumentData.getModels().stream().forEach(pmmlModelData -> {
             final String modelName = pmmlModelData.getModelName();
             final Set<PMMLParameterMetadata> fields =
                     pmmlModelData.getFields().stream().filter(field -> isValidInputField(field.getUsageType()))
                     .map(field -> new PMMLParameterMetadata(field.getFieldName())).collect(Collectors.toSet());
             models.add(new PMMLModelMetadata(modelName, fields));
-        });
+        });*/
         return new PMMLDocumentMetadata(pmmlFilePath,
                                         DMNImportTypes.PMML.getDefaultNamespace(),
                                         models);

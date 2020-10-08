@@ -18,6 +18,16 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DataInput.class, name = "dataInput"),
+        @JsonSubTypes.Type(value = DataOutput.class, name = "dataOutput"),
+        @JsonSubTypes.Type(value = InputSet.class, name = "inputSet"),
+        @JsonSubTypes.Type(value = OutputSet.class, name = "outputSet"),
+})
 public abstract class Data<T extends Data> {
 
     @XmlAttribute

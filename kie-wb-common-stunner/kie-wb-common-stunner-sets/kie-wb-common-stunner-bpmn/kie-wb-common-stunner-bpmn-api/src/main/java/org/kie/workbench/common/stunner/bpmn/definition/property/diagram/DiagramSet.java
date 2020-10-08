@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.databinding.client.api.Bindable;
@@ -124,6 +125,7 @@ public class DiagramSet implements BaseDiagramSet {
     )
     @Valid
     @XmlTransient
+    @JsonIgnore
     private ProcessInstanceDescription processInstanceDescription;
 
     @Property
@@ -133,6 +135,7 @@ public class DiagramSet implements BaseDiagramSet {
     )
     @Valid
     @XmlTransient
+    @JsonIgnore
     private Imports imports;
 
     @Property
@@ -145,8 +148,10 @@ public class DiagramSet implements BaseDiagramSet {
     @Property
     @FormField(afterElement = "executable")
     @XmlTransient
+    @JsonIgnore
     private SLADueDate slaDueDate;
 
+    //@JsonIgnore
     @XmlElementRefs({
             @XmlElementRef(name = "metaData", type = MetaData.class),
             @XmlElementRef(name = "import", type = Import.class),
@@ -167,16 +172,16 @@ public class DiagramSet implements BaseDiagramSet {
 
     public DiagramSet() {
         this(new Name(),
-                new Documentation(),
-                new Id(),
-                new Package(),
-                new ProcessType(),
-                new Version(),
-                new AdHoc(),
-                new ProcessInstanceDescription(),
-                new Imports(),
-                new Executable(),
-                new SLADueDate());
+             new Documentation(),
+             new Id(),
+             new Package(),
+             new ProcessType(),
+             new Version(),
+             new AdHoc(),
+             new ProcessInstanceDescription(),
+             new Imports(),
+             new Executable(),
+             new SLADueDate());
     }
 
     public DiagramSet(final @MapsTo("name") Name name,
@@ -205,16 +210,16 @@ public class DiagramSet implements BaseDiagramSet {
 
     public DiagramSet(final String name) {
         this(new Name(name),
-                new Documentation(),
-                new Id(),
-                new Package(),
-                new ProcessType(),
-                new Version(),
-                new AdHoc(),
-                new ProcessInstanceDescription(),
-                new Imports(),
-                new Executable(),
-                new SLADueDate());
+             new Documentation(),
+             new Id(),
+             new Package(),
+             new ProcessType(),
+             new Version(),
+             new AdHoc(),
+             new ProcessInstanceDescription(),
+             new Imports(),
+             new Executable(),
+             new SLADueDate());
     }
 
     @Override
@@ -324,7 +329,6 @@ public class DiagramSet implements BaseDiagramSet {
         this.properties = properties;
     }
 
-
     public List<BPMNViewDefinition> getDefinitionList() {
         return definitionList;
     }
@@ -344,16 +348,16 @@ public class DiagramSet implements BaseDiagramSet {
     @Override
     public int hashCode() {
         return HashUtil.combineHashCodes(Objects.hashCode(name),
-                Objects.hashCode(documentation),
-                Objects.hashCode(id),
-                Objects.hashCode(packageProperty),
-                Objects.hashCode(processType),
-                Objects.hashCode(version),
-                Objects.hashCode(adHoc),
-                Objects.hashCode(processInstanceDescription),
-                Objects.hashCode(imports),
-                Objects.hashCode(executable),
-                Objects.hashCode(slaDueDate));
+                                         Objects.hashCode(documentation),
+                                         Objects.hashCode(id),
+                                         Objects.hashCode(packageProperty),
+                                         Objects.hashCode(processType),
+                                         Objects.hashCode(version),
+                                         Objects.hashCode(adHoc),
+                                         Objects.hashCode(processInstanceDescription),
+                                         Objects.hashCode(imports),
+                                         Objects.hashCode(executable),
+                                         Objects.hashCode(slaDueDate));
     }
 
     @Override

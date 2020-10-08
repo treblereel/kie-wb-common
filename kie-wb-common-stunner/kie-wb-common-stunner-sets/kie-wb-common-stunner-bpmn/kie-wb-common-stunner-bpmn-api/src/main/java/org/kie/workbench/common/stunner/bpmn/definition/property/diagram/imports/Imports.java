@@ -17,6 +17,7 @@ package org.kie.workbench.common.stunner.bpmn.definition.property.diagram.import
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.databinding.client.api.Bindable;
@@ -41,6 +42,7 @@ public class Imports implements BPMNProperty {
 
     @Value
     @FieldValue
+    @JsonIgnore
     private ImportsValue value = new ImportsValue();
 
     public Imports() {

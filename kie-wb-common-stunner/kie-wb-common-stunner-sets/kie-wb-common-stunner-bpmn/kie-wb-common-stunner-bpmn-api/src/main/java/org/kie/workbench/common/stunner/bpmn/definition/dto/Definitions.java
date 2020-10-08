@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.dominokit.jacksonapt.annotation.JSONMapper;
 import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagramImpl;
 import org.kie.workbench.common.stunner.bpmn.definition.property.diagram.DiagramSet;
 import org.treblereel.gwt.jackson.api.annotation.TargetNamespace;
@@ -30,6 +31,7 @@ import org.treblereel.gwt.jackson.api.annotation.XMLMapper;
 import org.treblereel.gwt.jackson.api.annotation.XmlUnwrappedCollection;
 
 @XMLMapper
+@JSONMapper
 @XmlType(propOrder = {"import", "itemDefinition", "process", "BPMNDiagram"})
 @XmlRootElement(name = "definitions", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 @TargetNamespace(prefix = "bpmn2", namespace = "http://www.omg.org/bpmn20")
@@ -146,7 +148,7 @@ public class Definitions {
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) {
             return false;
         }
-/*        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
+        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
             return false;
         }
         if (getExporter() != null ? !getExporter().equals(that.getExporter()) : that.getExporter() != null) {
@@ -166,7 +168,7 @@ public class Definitions {
         }
         if (getBpmnDiagram() != null ? !getBpmnDiagram().equals(that.getBpmnDiagram()) : that.getBpmnDiagram() != null) {
             return false;
-        }*/
+        }
         return getRelationship() != null ? getRelationship().equals(that.getRelationship()) : that.getRelationship() == null;
     }
 

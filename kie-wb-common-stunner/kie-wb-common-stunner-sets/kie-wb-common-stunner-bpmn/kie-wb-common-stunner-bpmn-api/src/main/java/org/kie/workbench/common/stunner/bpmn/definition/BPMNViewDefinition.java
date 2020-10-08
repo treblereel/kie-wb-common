@@ -16,12 +16,19 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.kie.workbench.common.stunner.bpmn.definition.property.background.BackgroundSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.font.FontSet;
 
 /**
  * Marker interface for all BPMN definitions.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = UserTask.class, name = "userTask"),
+        @JsonSubTypes.Type(value = NoneTask.class, name = "noneTask"),
+})
 public interface BPMNViewDefinition extends BPMNDefinition {
 
     BackgroundSet getBackgroundSet();

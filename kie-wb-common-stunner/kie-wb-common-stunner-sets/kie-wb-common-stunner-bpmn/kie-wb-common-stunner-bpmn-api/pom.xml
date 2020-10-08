@@ -195,6 +195,16 @@
       <artifactId>processor</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.dominokit.jackson</groupId>
+      <artifactId>jackson-apt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.dominokit.jackson</groupId>
+      <artifactId>jackson-apt-processor</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- Testing -->
 
     <dependency>

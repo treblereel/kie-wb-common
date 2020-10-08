@@ -98,4 +98,11 @@ public class Script extends ExtensionElement {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Script{" +
+                "script='" + script + '\'' +
+                ", scriptFormat='" + scriptFormat + '\'' +
+                '}';
+    }
 }

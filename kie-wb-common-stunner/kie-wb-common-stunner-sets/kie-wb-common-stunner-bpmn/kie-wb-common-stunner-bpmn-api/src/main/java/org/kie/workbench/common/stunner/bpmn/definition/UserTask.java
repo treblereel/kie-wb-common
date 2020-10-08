@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.databinding.client.api.Bindable;
@@ -85,6 +86,7 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
             afterElement = "general"
     )
     @Valid
+    @JsonIgnore
     @XmlTransient
     protected UserTaskExecutionSet executionSet;
     @XmlAttribute
@@ -92,6 +94,8 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
     @XmlAttribute
     private String name;
     private Documentation documentation;
+
+
     @XmlElementRefs({
             @XmlElementRef(name = "metaData", type = MetaData.class),
             @XmlElementRef(name = "import", type = Import.class),
@@ -108,6 +112,7 @@ public class UserTask extends BaseUserTask<UserTaskExecutionSet> {
     })
     @XmlElement(name = "ioSpecification", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
     private List<Data> ioSpecification;
+
     @XmlElementRefs({
             @XmlElementRef(name = "dataInputAssociation", type = DataInputAssociation.class),
             @XmlElementRef(name = "dataOutputAssociation", type = DataOutputAssociation.class),

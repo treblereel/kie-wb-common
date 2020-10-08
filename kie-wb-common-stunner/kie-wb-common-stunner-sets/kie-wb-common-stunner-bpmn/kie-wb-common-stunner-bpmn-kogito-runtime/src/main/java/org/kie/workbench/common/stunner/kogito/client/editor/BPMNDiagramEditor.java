@@ -64,7 +64,9 @@ import org.kie.workbench.common.stunner.forms.client.widgets.FormsFlushManager;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPreviewAndExplorerDock;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPropertiesDock;
 import org.kie.workbench.common.stunner.kogito.client.editor.event.OnDiagramFocusEvent;
+import org.kie.workbench.common.stunner.kogito.client.marshalling.fromstunner.DiagramToJsonFactory;
 import org.kie.workbench.common.stunner.kogito.client.marshalling.fromstunner.DiagramToXmlFactory;
+import org.kie.workbench.common.stunner.kogito.client.marshalling.tostunner.JsonToDiagramFactory;
 import org.kie.workbench.common.stunner.kogito.client.marshalling.tostunner.XmlToDiagramFactory;
 import org.kie.workbench.common.stunner.kogito.client.menus.BPMNStandaloneEditorMenuSessionItems;
 import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPerspective;
@@ -102,13 +104,12 @@ import org.uberfire.workbench.model.menu.Menus;
 public class BPMNDiagramEditor extends AbstractDiagramEditor {
 
     public static final String EDITOR_ID = "BPMNDiagramEditor";
-
+    protected final AbstractKogitoClientDiagramService diagramServices;
+    protected final FormsFlushManager formsFlushManager;
     private final DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
     private final DiagramEditorPropertiesDock diagramPropertiesDock;
     private final LayoutHelper layoutHelper;
     private final OpenDiagramLayoutExecutor openDiagramLayoutExecutor;
-    protected final AbstractKogitoClientDiagramService diagramServices;
-    protected final FormsFlushManager formsFlushManager;
     private final CanvasFileExport canvasFileExport;
     private final Promises promises;
     private final CanvasDiagramValidator<AbstractCanvasHandler> validator;
@@ -174,121 +175,121 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         getWidget().init(this);
     }
 
-    @AfterInitialization
-    public void initMarshalling() {
-        Js.asPropertyMap(DomGlobal.window).set("serialize", (Serialize) () -> getXML());
-        Js.asPropertyMap(DomGlobal.window).set("deserialize", (Deserialize) xml -> setXML(xml));
-    }
-
     void superDoStartUp(final PlaceRequest place) {
         super.doStartUp(place);
     }
 
-    @Override
-    public void open(final Diagram diagram,
-                     final Viewer.Callback callback) {
-        this.layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
-        super.open(diagram, callback);
+    void initDocks() {
+        diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+        diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
     }
 
-    @OnOpen
-    @SuppressWarnings("unused")
-    public void onOpen() {
-        super.doOpen();
+    @AfterInitialization
+    public void initMarshalling() {
+        Js.asPropertyMap(DomGlobal.window).set("xmlSerialize", (Serialize) () -> getXML());
+        Js.asPropertyMap(DomGlobal.window).set("xmlDeserialize", (Deserialize) xml -> setXML(xml));
+
+        Js.asPropertyMap(DomGlobal.window).set("jsonSerialize", (Serialize) () -> getJSON());
+        Js.asPropertyMap(DomGlobal.window).set("jsonDeserialize", (Deserialize) xml -> setJSON(xml));
     }
 
-    @OnClose
-    @SuppressWarnings("unused")
-    public void onClose() {
-        superOnClose();
-        closeDocks();
-    }
-
-    void superOnClose() {
-        super.doClose();
-    }
-
-    @Override
-    public void onDiagramLoad() {
-        final Optional<CanvasHandler> canvasHandler = Optional.ofNullable(getCanvasHandler());
-
-        canvasHandler.ifPresent(c -> {
-            final Metadata metadata = c.getDiagram().getMetadata();
-            metadata.setPath(makeMetadataPath(metadata.getRoot(), metadata.getTitle()));
-            openDocks();
-        });
-    }
-
-    private Path makeMetadataPath(final Path root,
-                                  final String title) {
-        final String uri = root.toURI();
-        return PathFactory.newPath(title, uri + "/" + title + ".bpmn");
-    }
-
-    @OnFocus
-    @SuppressWarnings("unused")
-    public void onFocus() {
-        superDoFocus();
-        onDiagramLoad();
-    }
-
-    void superDoFocus() {
-        super.doFocus();
-    }
-
-    @OnLostFocus
-    @SuppressWarnings("unused")
-    public void onLostFocus() {
-        super.doLostFocus();
-    }
-
-    @Override
-    @WorkbenchPartTitleDecoration
-    public IsWidget getTitle() {
-        return super.getTitle();
-    }
-
-    @WorkbenchPartTitle
-    public String getTitleText() {
-        return "";
-    }
-
-    @WorkbenchMenu
-    public void getMenus(final Consumer<Menus> menusConsumer) {
-        menusConsumer.accept(super.getMenus());
-    }
-
-    @Override
-    protected void makeMenuBar() {
-        if (!menuBarInitialized) {
-            getMenuSessionItems().populateMenu(getFileMenuBuilder());
-            makeAdditionalStunnerMenus(getFileMenuBuilder());
-            menuBarInitialized = true;
-        }
-    }
-
-    @Override
-    @WorkbenchPartView
-    public IsWidget asWidget() {
-        return super.asWidget();
-    }
-
-    @OnMayClose
-    public boolean onMayClose() {
-        return super.mayClose();
-    }
-
-    @Override
-    public String getEditorIdentifier() {
-        return EDITOR_ID;
-    }
-
-    @GetContent
-    @Override
-    public Promise getContent() {
+    private String getXML() {
         flush();
         validateDiagram(getCanvasHandler());
-        return diagramServices.transform(getEditor().getEditorProxy().getContentSupplier().get());
+        return new DiagramToXmlFactory(convert(getEditor()
+                                                       .getEditorProxy()
+                                                       .getContentSupplier()
+                                                       .get()
+                                                       .projectDiagram()
+                                                       .get())).toXml();
+    }
+
+    private Promise setXML(String xml) {
+        Promise<Void> promise =
+                promises.create((success, failure) -> {
+                    superOnClose();
+                    diagramServices.transform("default",
+                                              "",
+                                              new ServiceCallback<Diagram>() {
+                                                  @Override
+                                                  public void onSuccess(final Diagram diagram) {
+                                                      new XmlToDiagramFactory(xml, diagram).process();
+                                                      getEditor().open(diagram,
+                                                                       new Viewer.Callback() {
+                                                                           @Override
+                                                                           public void onSuccess() {
+                                                                               success.onInvoke((Void) null);
+                                                                           }
+
+                                                                           @Override
+                                                                           public void onError(ClientRuntimeError error) {
+                                                                               BPMNDiagramEditor.this.getEditor().onLoadError(error);
+                                                                               failure.onInvoke(error);
+                                                                           }
+                                                                       });
+                                                  }
+
+                                                  @Override
+                                                  public void onError(final ClientRuntimeError error) {
+                                                      BPMNDiagramEditor.this.getEditor().onLoadError(error);
+                                                      failure.onInvoke(error);
+                                                  }
+                                              });
+                });
+        return promise;
+    }
+
+    private String getJSON() {
+        flush();
+        validateDiagram(getCanvasHandler());
+        return new DiagramToJsonFactory(convert(getEditor()
+                                                        .getEditorProxy()
+                                                        .getContentSupplier()
+                                                        .get()
+                                                        .projectDiagram()
+                                                        .get())).toJson();
+    }
+
+    private Promise setJSON(String json) {
+        Promise<Void> promise =
+                promises.create((success, failure) -> {
+                    superOnClose();
+                    diagramServices.transform("default",
+                                              "",
+                                              new ServiceCallback<Diagram>() {
+                                                  @Override
+                                                  public void onSuccess(final Diagram diagram) {
+                                                      new JsonToDiagramFactory(json, diagram).process();
+                                                      getEditor().open(diagram,
+                                                                       new Viewer.Callback() {
+                                                                           @Override
+                                                                           public void onSuccess() {
+                                                                               success.onInvoke((Void) null);
+                                                                           }
+
+                                                                           @Override
+                                                                           public void onError(ClientRuntimeError error) {
+                                                                               BPMNDiagramEditor.this.getEditor().onLoadError(error);
+                                                                               failure.onInvoke(error);
+                                                                           }
+                                                                       });
+                                                  }
+
+                                                  @Override
+                                                  public void onError(final ClientRuntimeError error) {
+                                                      BPMNDiagramEditor.this.getEditor().onLoadError(error);
+                                                      failure.onInvoke(error);
+                                                  }
+                                              });
+                });
+        return promise;
+    }
+
+    void flush() {
+        if (getSessionPresenter() != null) {
+            ClientSession session = getSessionPresenter().getInstance();
+            formsFlushManager.flush(session, formElementUUID);
+        }
     }
 
     private void validateDiagram(CanvasHandler canvasHandler) {
@@ -309,14 +310,66 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         getSessionPresenter().displayNotifications(t -> true);
     }
 
-    @GetPreview
-    public Promise getPreview() {
-        CanvasHandler canvasHandler = getCanvasHandler();
-        if (canvasHandler != null) {
-            return Promise.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
-        } else {
-            return Promise.resolve("");
-        }
+    private DiagramImpl convert(final Diagram diagram) {
+        return new DiagramImpl(diagram.getName(),
+                               diagram.getGraph(),
+                               diagram.getMetadata());
+    }
+
+    void superOnClose() {
+        super.doClose();
+    }
+
+    @OnOpen
+    @SuppressWarnings("unused")
+    public void onOpen() {
+        super.doOpen();
+    }
+
+    @OnClose
+    @SuppressWarnings("unused")
+    public void onClose() {
+        superOnClose();
+        closeDocks();
+    }
+
+    void closeDocks() {
+        diagramPropertiesDock.close();
+        diagramPreviewAndExplorerDock.close();
+    }
+
+    @OnFocus
+    @SuppressWarnings("unused")
+    public void onFocus() {
+        superDoFocus();
+        onDiagramLoad();
+    }
+
+    void superDoFocus() {
+        super.doFocus();
+    }
+
+    private Path makeMetadataPath(final Path root,
+                                  final String title) {
+        final String uri = root.toURI();
+        return PathFactory.newPath(title, uri + "/" + title + ".bpmn");
+    }
+
+    void openDocks() {
+        diagramPropertiesDock.open();
+        diagramPreviewAndExplorerDock.open();
+    }
+
+    @OnLostFocus
+    @SuppressWarnings("unused")
+    public void onLostFocus() {
+        super.doLostFocus();
+    }
+
+    @Override
+    @WorkbenchPartTitleDecoration
+    public IsWidget getTitle() {
+        return super.getTitle();
     }
 
     @Override
@@ -363,94 +416,97 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         return promise;
     }
 
+    @GetContent
+    @Override
+    public Promise getContent() {
+        flush();
+        validateDiagram(getCanvasHandler());
+        return diagramServices.transform(getEditor().getEditorProxy().getContentSupplier().get());
+    }
+
     @Override
     public void resetContentHash() {
         setOriginalContentHash(getCurrentDiagramHash());
     }
 
-    void initDocks() {
-        diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
-        diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+    @WorkbenchPartTitle
+    public String getTitleText() {
+        return "";
     }
 
-    void openDocks() {
-        diagramPropertiesDock.open();
-        diagramPreviewAndExplorerDock.open();
+    @WorkbenchMenu
+    public void getMenus(final Consumer<Menus> menusConsumer) {
+        menusConsumer.accept(super.getMenus());
     }
 
-    void closeDocks() {
-        diagramPropertiesDock.close();
-        diagramPreviewAndExplorerDock.close();
+    @Override
+    protected void makeMenuBar() {
+        if (!menuBarInitialized) {
+            getMenuSessionItems().populateMenu(getFileMenuBuilder());
+            makeAdditionalStunnerMenus(getFileMenuBuilder());
+            menuBarInitialized = true;
+        }
+    }
+
+    @Override
+    public void open(final Diagram diagram,
+                     final Viewer.Callback callback) {
+        this.layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
+        super.open(diagram, callback);
+    }
+
+    @Override
+    public void onDiagramLoad() {
+        final Optional<CanvasHandler> canvasHandler = Optional.ofNullable(getCanvasHandler());
+
+        canvasHandler.ifPresent(c -> {
+            final Metadata metadata = c.getDiagram().getMetadata();
+            metadata.setPath(makeMetadataPath(metadata.getRoot(), metadata.getTitle()));
+            openDocks();
+        });
+    }
+
+    @Override
+    @WorkbenchPartView
+    public IsWidget asWidget() {
+        return super.asWidget();
+    }
+
+    @OnMayClose
+    public boolean onMayClose() {
+        return super.mayClose();
+    }
+
+    @Override
+    public String getEditorIdentifier() {
+        return EDITOR_ID;
+    }
+
+    @GetPreview
+    public Promise getPreview() {
+        CanvasHandler canvasHandler = getCanvasHandler();
+        if (canvasHandler != null) {
+            return Promise.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
+        } else {
+            return Promise.resolve("");
+        }
     }
 
     void onFormsOpenedEvent(@Observes FormPropertiesOpened event) {
         formElementUUID = event.getUuid();
     }
 
-    void flush() {
-        if (getSessionPresenter() != null) {
-            ClientSession session = getSessionPresenter().getInstance();
-            formsFlushManager.flush(session, formElementUUID);
-        }
-    }
-
-    private DiagramImpl convert(final Diagram diagram) {
-        return new DiagramImpl(diagram.getName(),
-                               diagram.getGraph(),
-                               diagram.getMetadata());
-    }
-
-    private String getXML() {
-       flush();
-       validateDiagram(getCanvasHandler());
-       return new DiagramToXmlFactory(convert(getEditor()
-                                 .getEditorProxy()
-                                 .getContentSupplier()
-                                 .get()
-                                 .projectDiagram()
-                                 .get())).toXml();
-    }
-        private Promise setXML(String xml) {
-            Promise<Void> promise =
-                promises.create((success, failure) -> {
-                    superOnClose();
-                    diagramServices.transform("default",
-                           "",
-                           new ServiceCallback<Diagram>() {
-                           @Override
-                           public void onSuccess(final Diagram diagram) {
-                              new XmlToDiagramFactory(xml, diagram).process();
-                              getEditor().open(diagram,
-                                      new Viewer.Callback() {
-                                      @Override
-                                      public void onSuccess() {
-                                          success.onInvoke((Void) null);
-                                      }
-                                      @Override
-                                      public void onError(ClientRuntimeError error) {
-                                          BPMNDiagramEditor.this.getEditor().onLoadError(error);
-                                          failure.onInvoke(error);
-                                      }
-                              });
-                           }
-                           @Override
-                           public void onError(final ClientRuntimeError error) {
-                               BPMNDiagramEditor.this.getEditor().onLoadError(error);
-                               failure.onInvoke(error);
-                           }
-                    });
-                });
-                return promise;
-            }
     @FunctionalInterface
     @JsFunction
     public interface Serialize {
+
         String onInvoke();
     }
 
     @FunctionalInterface
     @JsFunction
     public interface Deserialize {
+
         void onInvoke(String xml);
     }
 }

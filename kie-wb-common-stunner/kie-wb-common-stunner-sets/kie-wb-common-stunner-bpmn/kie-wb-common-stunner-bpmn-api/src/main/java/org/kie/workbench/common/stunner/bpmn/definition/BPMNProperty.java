@@ -16,9 +16,21 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.DataInputAssociation;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.DataOutputAssociation;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.MultiInstanceLoopCharacteristics;
+
 /**
  * Marker interface for all BPMN properties.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DataInputAssociation.class, name = "dataInputAssociation"),
+        @JsonSubTypes.Type(value = DataOutputAssociation.class, name = "dataOutputAssociation"),
+        @JsonSubTypes.Type(value = MultiInstanceLoopCharacteristics.class, name = "multiInstanceLoopCharacteristics")
+})
 public interface BPMNProperty {
 
 }

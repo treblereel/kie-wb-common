@@ -29,4 +29,8 @@ public class Import extends ExtensionElement {
         super(name);
     }
 
+    @Override
+    public String toString() {
+        return "Import{ " + this.getName() + " }";
+    }
 }

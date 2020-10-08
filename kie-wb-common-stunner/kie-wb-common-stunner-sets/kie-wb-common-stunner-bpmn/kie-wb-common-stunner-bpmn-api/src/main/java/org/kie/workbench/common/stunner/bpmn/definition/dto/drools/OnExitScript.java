@@ -27,4 +27,9 @@ public class OnExitScript extends Script {
     public OnExitScript(String script, String language) {
         super(script, language);
     }
+
+    @Override
+    public String toString() {
+        return "OnExitScript{" + super.toString() + "}";
+    }
 }

@@ -24,15 +24,25 @@
         function loadDiagram(diagram) {
             var path = "somePath";
             window.frames.editorFrame.contentWindow.gwtEditorBeans.get("BPMNDiagramEditor").get().setContent(path, diagram);
-            document.getElementById("download_btn").disabled = false;
-            document.getElementById("download_btn2").disabled = false;
+            unblockButtons();
         }
 
         function loadDiagram2(diagram) {
             var path = "somePath";
-            window.frames.editorFrame.contentWindow.deserialize(diagram)
+            window.frames.editorFrame.contentWindow.xmlDeserialize(diagram)
+            unblockButtons();
+        }
+
+        function loadDiagramJSON(diagram) {
+            var path = "somePath";
+            window.frames.editorFrame.contentWindow.jsonDeserialize(diagram)
+            unblockButtons();
+        }
+
+        function unblockButtons() {
             document.getElementById("download_btn").disabled = false;
             document.getElementById("download_btn2").disabled = false;
+            document.getElementById("download_btn_json").disabled = false;
         }
 
         function download() {
@@ -51,7 +61,11 @@
         }
 
         function download2() {
-            asFile(window.frames.editorFrame.contentWindow.serialize())
+            asFile(window.frames.editorFrame.contentWindow.xmlSerialize(), "bpmn")
+        }
+
+        function downloadJSON() {
+            asFile(window.frames.editorFrame.contentWindow.jsonSerialize(), "json")
         }
 
         var openFile = function (event) {
@@ -76,10 +90,21 @@
             reader.readAsText(input.files[0]);
         };
 
-        function  asFile(process) {
+        var openFileJSON = function (event) {
+            var input = event.target;
+            var reader = new FileReader();
+            reader.onload = function () {
+                var diagram = reader.result;
+                loadDiagramJSON(diagram)
+            };
+
+            reader.readAsText(input.files[0]);
+        };
+
+        function  asFile(process, extension) {
             var d = document.createElement('a');
             d.setAttribute('href', 'data:text/xml;charset=utf-8,' + encodeURIComponent(process));
-            d.setAttribute('download', "process.bpmn");
+            d.setAttribute('download', "process." + extension);
             d.style.display = 'none';
 
             document.body.appendChild(d);
@@ -100,9 +125,13 @@
     When you are ready you can
     <input type="button" id="download_btn" value="Download the process" onclick="download()" disabled/>
     <input type="button" id="download_btn2" value="Download the process using Next step marshalling" style="background-color: darksalmon;" onclick="download2()" disabled/>
+    <input type="button" id="download_btn_json" value="Download the process using JSON marshalling" style="background-color: blue;" onclick="downloadJSON()" disabled/>
 
     <button onclick="document.getElementById('fileUpload').click()" style="background-color: darksalmon;">load the process using Next step demarshalling</button>
-    <input type="file" id="fileUpload" name="files" style="display:none" onchange="openFile2(event)" accept="bpmn,bpmn2,txt"/ />
+    <input type="file" id="fileUpload" name="files" style="display:none" onchange="openFile2(event)" accept="bpmn,bpmn2,txt" />
+
+    <button onclick="document.getElementById('fileUploadJSON').click()" style="background-color: blue;">load the process using JSON demarshalling</button>
+    <input type="file" id="fileUploadJSON" name="files" style="display:none" onchange="openFileJSON(event)" accept="json,txt" />
 
 </div>
 

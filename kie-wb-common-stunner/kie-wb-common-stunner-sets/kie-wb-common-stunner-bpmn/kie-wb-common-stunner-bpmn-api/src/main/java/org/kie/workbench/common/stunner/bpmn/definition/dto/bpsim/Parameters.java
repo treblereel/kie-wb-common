@@ -16,5 +16,14 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.dto.bpsim;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = TimeParameters.class, name = "TimeParameters"),
+        @JsonSubTypes.Type(value = ResourceParameters.class, name = "ResourceParameters"),
+        @JsonSubTypes.Type(value = CostParameters.class, name = "CostParameters"),
+})
 public interface Parameters {
 }

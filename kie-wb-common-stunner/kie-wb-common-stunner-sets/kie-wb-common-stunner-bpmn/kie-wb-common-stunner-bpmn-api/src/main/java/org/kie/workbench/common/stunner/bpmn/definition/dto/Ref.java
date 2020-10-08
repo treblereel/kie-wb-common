@@ -16,10 +16,13 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Ref<T extends Ref> {
 
     private String value;
 
+    @JsonIgnore
     private transient boolean asCDATA = true;
 
     public Ref() {

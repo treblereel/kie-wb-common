@@ -22,6 +22,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.jboss.errai.databinding.client.api.Bindable;
@@ -73,6 +75,8 @@ public class BPMNDiagramImpl implements BPMNDiagram<DiagramSet, ProcessData, Adv
     @FormField
     @Valid
     @XmlTransient
+    @JsonIgnore
+    @JsonIgnoreProperties
     private DiagramSet diagramSet;
 
     @Property
@@ -81,6 +85,7 @@ public class BPMNDiagramImpl implements BPMNDiagram<DiagramSet, ProcessData, Adv
     )
     @Valid
     @XmlTransient
+    @JsonIgnore
     protected ProcessData processData;
 
     @Property
@@ -89,6 +94,7 @@ public class BPMNDiagramImpl implements BPMNDiagram<DiagramSet, ProcessData, Adv
     )
     @Valid
     @XmlTransient
+    @JsonIgnore
     protected AdvancedData advancedData;
 
     @Property
@@ -96,21 +102,26 @@ public class BPMNDiagramImpl implements BPMNDiagram<DiagramSet, ProcessData, Adv
             afterElement = ADVANCED_DATA
     )
     @XmlTransient
+    @JsonIgnore
     protected CaseManagementSet caseManagementSet;
 
     @Property
     @XmlTransient
+    @JsonIgnore
     private BackgroundSet backgroundSet;
 
     @Property
     @XmlTransient
+    @JsonIgnore
     private FontSet fontSet;
 
     @Property
     @XmlTransient
+    @JsonIgnore
     protected RectangleDimensionsSet dimensionsSet;
 
     @Labels
+    @JsonIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add("canContainArtifacts")
             .add("diagram")

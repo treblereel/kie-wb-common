@@ -18,6 +18,17 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto.drools;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = MetaData.class, name = "metaData"),
+        @JsonSubTypes.Type(value = Import.class, name = "import"),
+        @JsonSubTypes.Type(value = OnEntryScript.class, name = "onEntry-script"),
+        @JsonSubTypes.Type(value = OnExitScript.class, name = "onExit-script"),
+        @JsonSubTypes.Type(value = Global.class, name = "global")
+})
 public class ExtensionElement {
 
     @XmlAttribute
@@ -53,5 +64,12 @@ public class ExtensionElement {
     @Override
     public int hashCode() {
         return getName() != null ? getName().hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "ExtensionElement{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

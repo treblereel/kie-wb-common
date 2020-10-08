@@ -78,4 +78,12 @@ public class Global extends ExtensionElement {
         result = 31 * result + (getType() != null ? getType().hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Global{" +
+                "identifier='" + identifier + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

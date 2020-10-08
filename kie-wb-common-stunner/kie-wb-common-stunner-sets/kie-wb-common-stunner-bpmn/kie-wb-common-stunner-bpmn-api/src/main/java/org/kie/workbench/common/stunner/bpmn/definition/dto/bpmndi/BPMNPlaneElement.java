@@ -18,6 +18,14 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto.bpmndi;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = BPMNShape.class, name = "BPMNShape"),
+        @JsonSubTypes.Type(value = BPMNEdge.class, name = "BPMNEdge"),
+})
 public abstract class BPMNPlaneElement {
 
     @XmlAttribute

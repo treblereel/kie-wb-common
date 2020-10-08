@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.bpmn.definition.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.handler.AssignmentDemarshaller;
 import org.kie.workbench.common.stunner.bpmn.definition.dto.handler.AssignmentMarshaller;
 import org.treblereel.gwt.jackson.api.annotation.XmlTypeAdapter;
@@ -25,8 +26,10 @@ import org.treblereel.gwt.jackson.api.annotation.XmlTypeAdapter;
         deserializer = AssignmentDemarshaller.class)
 public class Assignment {
 
-    private transient AssignmentValue from;
-    private transient AssignmentValue to;
+    //@JsonIgnore
+    protected transient AssignmentValue from;
+    //@JsonIgnore
+    protected transient AssignmentValue to;
 
     public Assignment() {
 
@@ -60,6 +63,11 @@ public class Assignment {
         return to;
     }
 
+    public Assignment setTo(AssignmentValue to) {
+        this.to = to;
+        return this;
+    }
+
     public Assignment to(String to) {
         this.to = new AssignmentValue(to);
         return this;
@@ -82,6 +90,7 @@ public class Assignment {
     public static class AssignmentValue {
 
         private String value;
+        @JsonIgnore
         private transient boolean asCDATA = true;
 
         public AssignmentValue() {

@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.kie.soup.commons.util.Maps;
 import org.kie.soup.commons.util.Sets;
@@ -66,28 +67,34 @@ public abstract class BaseTask implements BPMNViewDefinition {
     @FormField
     @Valid
     @XmlTransient
+    @JsonIgnore
     protected TaskGeneralSet general;
 
     @Property
     @MorphProperty(binder = TaskTypeMorphPropertyBinding.class)
     @XmlTransient
+    @JsonIgnore
     protected TaskType taskType;
 
     @Property
     @Valid
     @XmlTransient
+    @JsonIgnore
     protected BackgroundSet backgroundSet;
 
     @Property
     @XmlTransient
+    @JsonIgnore
     protected FontSet fontSet;
 
     @Property
     @XmlTransient
+    @JsonIgnore
     protected SimulationSet simulationSet;
 
     @Property
     @XmlTransient
+    @JsonIgnore
     protected RectangleDimensionsSet dimensionsSet;
 
     public static class TaskTypeMorphPropertyBinding implements MorphPropertyValueBinding<TaskType, TaskTypes> {
@@ -117,7 +124,9 @@ public abstract class BaseTask implements BPMNViewDefinition {
         }
     }
 
+    //TODO looks like a bug
     @Labels
+    @JsonIgnore
     protected final Set<String> labels = new HashSet<>(TASK_LABELS);
 
     public BaseTask(final @MapsTo("general") TaskGeneralSet general,

@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.definition.dto.drools;
+package org.kie.workbench.common.stunner.backend.i18n;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Arrays;
+import java.util.Optional;
 
-@XmlRootElement(name = "onEntry-script", namespace = "http://www.jboss.org/drools")
-public class OnEntryScript extends Script {
+import javax.enterprise.context.ApplicationScoped;
 
-    public OnEntryScript() {
-    }
+import org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService;
 
-    public OnEntryScript(String script, String language) {
-        super(script, language);
+@ApplicationScoped
+public class BackendTranslationService extends AbstractTranslationService {
+
+    @Override
+    public String getValue(String key) {
+        return key;
     }
 
     @Override
-    public String toString() {
-        return "OnEntryScript{" + super.toString() + "}";
+    public String getValue(String key, Object... args) {
+        return key + Arrays.toString(args);
+    }
+
+    @Override
+    public Optional<String> getElementName(String uuid) {
+        return Optional.of(uuid);
     }
 }

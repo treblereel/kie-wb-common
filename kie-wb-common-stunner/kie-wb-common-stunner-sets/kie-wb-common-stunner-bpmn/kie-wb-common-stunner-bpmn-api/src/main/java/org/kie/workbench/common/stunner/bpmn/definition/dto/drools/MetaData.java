@@ -57,4 +57,11 @@ public class MetaData extends ExtensionElement {
         result = 31 * result + (getMetaValue() != null ? getMetaValue().hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "MetaData{" +
+                "metaValue=" + metaValue +
+                '}';
+    }
 }

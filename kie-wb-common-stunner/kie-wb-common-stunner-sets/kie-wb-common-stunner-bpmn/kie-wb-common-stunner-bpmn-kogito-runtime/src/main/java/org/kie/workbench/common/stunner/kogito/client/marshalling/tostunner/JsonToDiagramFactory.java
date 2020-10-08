@@ -16,22 +16,22 @@
 
 package org.kie.workbench.common.stunner.kogito.client.marshalling.tostunner;
 
-import javax.xml.stream.XMLStreamException;
-
-import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions_XMLMapperImpl;
+import org.dominokit.jacksonapt.DefaultJsonDeserializationContext;
+import org.dominokit.jacksonapt.JsonDeserializationContext;
+import org.dominokit.jacksonapt.exception.JsonDeserializationException;
+import org.kie.workbench.common.stunner.bpmn.definition.dto.Definitions_MapperImpl;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
-import org.treblereel.gwt.jackson.api.DefaultXMLDeserializationContext;
-import org.treblereel.gwt.jackson.api.XMLDeserializationContext;
 
-public class XmlToDiagramFactory extends DiagramFactory {
+public class JsonToDiagramFactory extends DiagramFactory {
 
-    public XmlToDiagramFactory(String xml, Diagram diagram) {
+    public JsonToDiagramFactory(String json, Diagram diagram) {
         super(diagram);
         try {
-            XMLDeserializationContext context = DefaultXMLDeserializationContext.builder().failOnUnknownProperties(false).build();
-            definitions = Definitions_XMLMapperImpl.INSTANCE.read(xml, context);
-        } catch (XMLStreamException e) {
-            throw new Error("Unable to process xml \n" + xml);
+            JsonDeserializationContext context = DefaultJsonDeserializationContext.builder()
+                    .failOnUnknownProperties(true).build();
+            definitions = Definitions_MapperImpl.INSTANCE.read(json, context);
+        } catch (JsonDeserializationException e) {
+            throw new Error("Unable to process json \n" + json);
         }
     }
 }

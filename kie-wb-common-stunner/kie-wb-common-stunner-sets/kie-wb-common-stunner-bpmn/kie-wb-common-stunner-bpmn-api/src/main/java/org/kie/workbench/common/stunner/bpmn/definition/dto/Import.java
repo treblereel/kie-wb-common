@@ -19,10 +19,13 @@ package org.kie.workbench.common.stunner.bpmn.definition.dto;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @XmlRootElement(name = "import", namespace = "http://www.omg.org/spec/BPMN/20100524/MODEL")
 public class Import {
 
     @XmlAttribute
+    @JsonIgnore
     private String importType = "http://schemas.xmlsoap.org/wsdl/";
     @XmlAttribute
     private String location;
@@ -66,6 +69,16 @@ public class Import {
         return getNamespace() != null ? getNamespace().equals(anImport.getNamespace()) : anImport.getNamespace() == null;
     }
 
+    @Override
+    public String toString() {
+        return "Import{" +
+                "importType='" + importType + '\'' +
+                ", location='" + location + '\'' +
+                ", namespace='" + namespace + '\'' +
+                '}';
+    }
+
+    //TODO possible gwt bug
     public String getImportType() {
         return importType;
     }
