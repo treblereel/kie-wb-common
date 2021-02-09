@@ -37,7 +37,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.command.Command;
 import org.kie.workbench.common.stunner.core.util.StringUtils;
-import org.uberfire.client.views.pfly.monaco.jsinterop.MonacoEditor;
 import org.uberfire.client.views.pfly.monaco.jsinterop.MonacoStandaloneCodeEditor;
 import org.uberfire.ext.wires.core.grids.client.model.impl.BaseGridCellValue;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridBodyCellRenderContext;
@@ -99,19 +98,9 @@ public class MonacoEditorDOMElement extends BaseDOMElement<String, MonacoEditorW
         style.setHeight(100,
                         PCT);
 
-        final MonacoPropertiesFactory properties = makeMonacoPropertiesFactory();
-        final MonacoStandaloneCodeEditor codeEditor = getMonacoEditor().create(uncheckedCast(widget.getElement()),
-                                                                               properties.getConstructionOptions());
-
-        codeEditor.onKeyDown(getOnKeyDown(codeEditor));
-        codeEditor.onDidBlurEditorWidget(getWidgetTrigger(getBlurEvent()));
-
-        widget.setCodeEditor(codeEditor);
+        widget.getCodeEditor().onKeyDown(getOnKeyDown(widget.getCodeEditor()));
+        widget.getCodeEditor().onDidBlurEditorWidget(getWidgetTrigger(getBlurEvent()));
         widget.setFocus(true);
-    }
-
-    MonacoEditor getMonacoEditor() {
-        return MonacoEditor.get();
     }
 
     MonacoStandaloneCodeEditor.CallbackFunction getOnKeyDown(final MonacoStandaloneCodeEditor codeEditor) {
@@ -169,8 +158,7 @@ public class MonacoEditorDOMElement extends BaseDOMElement<String, MonacoEditorW
     @Override
     @SuppressWarnings("unchecked")
     public void flush(final String value) {
-
-        widget.getCodeEditor().ifPresent(c -> c.dispose());
+        widget.dispose();
 
         if (Objects.equals(value,
                            originalValue)) {
